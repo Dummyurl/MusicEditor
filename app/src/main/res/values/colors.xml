@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#363743</color>
+    <color name="colorPrimaryDark">#363743</color>
+    <color name="colorToolbar">#2B2C36</color>
+    <color name="colorAccent">#FF7C22</color>
+    <color name="back_ground">#363743</color>
+    <color name="high_light">#7bff7c22</color>
+    <color name="background_ic">#E4E4E4</color>
+    <color name="bg_ic">#4A4B56</color>
+    <color name="devider">#899e9e9e</color>
+    <color name="text_color_select">#9e9e9e</color>
+    <color name="text_color">#4A4A4A</color>
+</resources>

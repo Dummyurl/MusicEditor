@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Music Editor</string>
+    <string name="more_app">More app</string>
+    <string name="studio">Studio</string>
+    <string name="recorder">Recorder</string>
+    <string name="converter">Converter</string>
+    <string name="merger_audio">Merger audio</string>
+    <string name="audio_cutter">Audio Cutter</string>
+    <string name="ads">Advertiment</string>
+    <string name="save">Save</string>
+    <string name="quality">Quality</string>
+    <string name="format">Format</string>
+    <string name="input_format">Input Format</string>
+    <string name="output_format">Output Format</string>
+    <string name="bitrate">Bitrate</string>
+</resources>
