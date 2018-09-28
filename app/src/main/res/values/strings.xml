@@ -13,4 +13,6 @@
     <string name="input_format">Input Format</string>
     <string name="output_format">Output Format</string>
     <string name="bitrate">Bitrate</string>
+    <string name="search">Search</string>
+    <string name="loading">Loading...</string>
 </resources>

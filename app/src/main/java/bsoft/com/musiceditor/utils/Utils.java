@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import bsoft.com.musiceditor.model.AudioEntity;
+
 /**
  * Created by Windows 10 Gamer on 01/03/2018.
  */
@@ -40,9 +41,22 @@ public class Utils {
     public static final String FORMAT_AVI = ".avi";
     public static final String FORMAT_FLV = ".flv";
     public static final String PREFERENCE_URI = "copy_utils";
-    public static final String AUDIO_ENTITY ="audio_entity" ;
+    public static final String AUDIO_ENTITY = "audio_entity";
 
     private static Pattern pattern = Pattern.compile("time=([\\d\\w:]+)");
+
+    public static List<AudioEntity> filterAudioEntity(List<AudioEntity> recordList, String query) {
+        String s = Utils.unAccent(query.toLowerCase());
+        List<AudioEntity> filteredModelList = new ArrayList<>();
+
+        for (AudioEntity record : recordList) {
+            String text = Utils.unAccent(record.getNameAudio().toLowerCase());
+            if (text.contains(s)) {
+                filteredModelList.add(record);
+            }
+        }
+        return filteredModelList;
+    }
 
     public static String getStringSizeLengthFile(long size) {
 

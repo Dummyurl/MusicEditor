@@ -13,17 +13,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.model.AudioEntity;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
 
-    private ArrayList<AudioEntity> audioEntities;
+    private List<AudioEntity> audioEntities;
     private Context context;
     private OnClick callback;
 
-    public AudioAdapter(ArrayList<AudioEntity> audioEntities, Context context, OnClick callback) {
+    public AudioAdapter(List<AudioEntity> audioEntities, Context context, OnClick callback) {
         this.audioEntities = audioEntities;
         this.callback = callback;
         this.context = context;
@@ -35,6 +36,12 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View itemView = inflater.inflate(R.layout.item_audio, parent, false);
         return new ViewHolder(itemView);
+    }
+
+    public void setFilter(List<AudioEntity> list) {
+        audioEntities = new ArrayList<>();
+        audioEntities = list;
+        notifyDataSetChanged();
     }
 
     @Override
