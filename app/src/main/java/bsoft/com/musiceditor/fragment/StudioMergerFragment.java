@@ -9,25 +9,24 @@ import android.view.ViewGroup;
 
 import bsoft.com.musiceditor.R;
 
-public class CutterStudioFragment extends BaseFragment {
-
-    public static CutterStudioFragment newInstance() {
+public class StudioMergerFragment extends BaseFragment {
+    public static StudioMergerFragment newInstance() {
         
         Bundle args = new Bundle();
         
-        CutterStudioFragment fragment = new CutterStudioFragment();
+        StudioMergerFragment fragment = new StudioMergerFragment();
         fragment.setArguments(args);
         return fragment;
     }
+    
     @Override
     public void initViews() {
-        
+
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_studio_cutter, container, false);
-
     }
 }

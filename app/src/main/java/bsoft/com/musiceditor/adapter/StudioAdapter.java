@@ -4,10 +4,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import bsoft.com.musiceditor.fragment.ConverterStudioFragment;
-import bsoft.com.musiceditor.fragment.CutterStudioFragment;
-import bsoft.com.musiceditor.fragment.MergerStudioFragment;
-import bsoft.com.musiceditor.fragment.RecorderStudioFragment;
+import bsoft.com.musiceditor.fragment.StudioConverterFragment;
+import bsoft.com.musiceditor.fragment.StudioCutterFragment;
+import bsoft.com.musiceditor.fragment.StudioMergerFragment;
+import bsoft.com.musiceditor.fragment.StudioRecorderFragment;
 
 public class StudioAdapter extends FragmentStatePagerAdapter {
 
@@ -30,16 +30,16 @@ public class StudioAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case INDEX_CUTTER:
-                return CutterStudioFragment.newInstance();
+                return StudioCutterFragment.newInstance();
 
             case INDEX_MERGER:
-                return MergerStudioFragment.newInstance();
+                return StudioMergerFragment.newInstance();
 
             case INDEX_CONVERTER:
-                return ConverterStudioFragment.newInstance();
+                return StudioConverterFragment.newInstance();
 
             case INDEX_RECORDER:
-                return RecorderStudioFragment.newInstance();
+                return StudioRecorderFragment.newInstance();
         }
         return null;
     }

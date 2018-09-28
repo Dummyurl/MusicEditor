@@ -78,8 +78,11 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
 
         public ViewHolder(View itemView) {
             super(itemView);
+
             ivState = itemView.findViewById(R.id.iv_state);
+
             tvQuality = itemView.findViewById(R.id.tv_format);
+
             itemView.setOnClickListener(v -> callback.onItemClick(getAdapterPosition()));
         }
     }

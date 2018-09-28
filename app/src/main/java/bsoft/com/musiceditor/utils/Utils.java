@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
 import java.io.File;
@@ -42,8 +45,31 @@ public class Utils {
     public static final String FORMAT_FLV = ".flv";
     public static final String PREFERENCE_URI = "copy_utils";
     public static final String AUDIO_ENTITY = "audio_entity";
+    public static final String BITRATE_WAV ="bitrate_wav" ;
+    public static final String BITRATE_MP3 ="bitrate_mp3" ;
 
     private static Pattern pattern = Pattern.compile("time=([\\d\\w:]+)");
+
+    public static void addAudio(String path, String title,Context context) {
+        ContentValues values = new ContentValues();
+        values.put(MediaStore.Audio.Media.DURATION, Utils.getMediaDuration(path));
+        values.put(MediaStore.Audio.Media.TITLE, title);
+        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/*");
+        values.put(MediaStore.Audio.Media.SIZE, new File(path).length());
+        values.put(MediaStore.Audio.Media.ARTIST, "<unknow>");
+        values.put(MediaStore.Audio.Media.DATA, new File(path).getAbsolutePath());
+        values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+
+        Uri newUri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, newUri));
+
+        if (newUri == null) {
+            Log.e("xxx", "update contentresolver failllllllllllllllllll");
+        } else {
+            Log.e("xxx", "update contenresolver");
+        }
+    }
 
     public static List<AudioEntity> filterAudioEntity(List<AudioEntity> recordList, String query) {
         String s = Utils.unAccent(query.toLowerCase());
@@ -220,6 +246,59 @@ public class Utils {
         c.close();
         return mListSong;
     }
+
+    public static List<AudioEntity> getAudioConvert(Context context) {
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Uri ART_CONTENT_URI = Uri.parse("content://media/external/audio/albumart");
+        List<AudioEntity> mListSong = new ArrayList<>();
+        String[] m_data = {MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.ARTIST,
+                MediaStore.Audio.Media.ALBUM,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media.DATE_MODIFIED
+        };
+
+        Cursor c = context.getContentResolver().query(uri, m_data, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+
+        if (c != null && c.moveToNext()) {
+            do {
+                String name, album, artist, path, id, audioType, dateModifier;
+                String duration;
+                int albumId, artistId;
+
+                id = c.getString(c.getColumnIndex(MediaStore.Audio.Media._ID));
+                name = c.getString(c.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                album = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                artist = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+                path = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATA));
+                duration = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DURATION));
+
+                albumId = c.getInt(c.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                dateModifier = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
+                String imagePath = ContentUris.withAppendedId(ART_CONTENT_URI, albumId).toString();
+
+                AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier);
+
+                try {
+
+                    if (duration != null && Long.parseLong(duration) > 0 && path.contains("/Converter")) {
+                        mListSong.add(audio);
+                    }
+                } catch (Exception e) {
+
+                    e.printStackTrace();
+                }
+
+            } while (c.moveToNext());
+        }
+
+        c.close();
+        return mListSong;
+    }
+
 
     public static int getMediaDuration(String filePath) {
         MediaMetadataRetriever metaInfo = new MediaMetadataRetriever();

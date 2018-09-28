@@ -7,18 +7,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import bsoft.com.musiceditor.R;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ConverterStudioFragment extends BaseFragment {
-    public static ConverterStudioFragment newInstance() {
-        
+import bsoft.com.musiceditor.R;
+import bsoft.com.musiceditor.model.AudioEntity;
+
+public class StudioRecorderFragment extends BaseFragment {
+    private List<AudioEntity> audioEntityList = new ArrayList<>();
+    public static StudioRecorderFragment newInstance() {
+
         Bundle args = new Bundle();
-        
-        ConverterStudioFragment fragment = new ConverterStudioFragment();
+
+        StudioRecorderFragment fragment = new StudioRecorderFragment();
         fragment.setArguments(args);
         return fragment;
     }
-   
+
     @Override
     public void initViews() {
 

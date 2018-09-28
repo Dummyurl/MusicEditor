@@ -15,4 +15,13 @@
     <string name="bitrate">Bitrate</string>
     <string name="search">Search</string>
     <string name="loading">Loading...</string>
+    <string name="can_not_play_this_file">Can not play this file!</string>
+    <string name="decoding">Decoding</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="file_name_empty">File name can not be empty!</string>
+    <string name="startRecord">Start record</string>
+    <string name="record">Record</string>
+    <string name="recording">Recording...</string>
+    <string name="stopRecord">Stopped record!</string>
 </resources>

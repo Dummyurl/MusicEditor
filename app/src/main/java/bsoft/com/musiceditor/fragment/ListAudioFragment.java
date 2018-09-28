@@ -29,8 +29,8 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
     private RecyclerView rvAudio;
     private AudioAdapter adapter;
     private List<AudioEntity> audioEntityList = new ArrayList<>();
-    private SearchView searchView;
     private List<AudioEntity> listAllAudioEntity = new ArrayList<>();
+    private SearchView searchView;
     private ProgressDialog dialogLoading;
 
     public static ListAudioFragment newInstance() {
@@ -123,7 +123,6 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
             public void onNext(List<AudioEntity> songs) {
                 listAllAudioEntity.clear();
                 listAllAudioEntity.addAll(songs);
-
                 audioEntityList.clear();
                 audioEntityList.addAll(listAllAudioEntity);
             }

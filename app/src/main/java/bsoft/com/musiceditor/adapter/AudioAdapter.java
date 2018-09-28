@@ -17,6 +17,7 @@ import java.util.List;
 
 import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.model.AudioEntity;
+import bsoft.com.musiceditor.utils.Utils;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
 
@@ -50,6 +51,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
 
         holder.tvNameSong.setText(audioEntity.getNameAudio());
         holder.tvNameArtist.setText(audioEntity.getNameArtist());
+        holder.tvDuration.setText(Utils.convertMillisecond(Long.parseLong(audioEntity.getDuration())));
 
         RequestOptions options = new RequestOptions();
         options.error(R.drawable.ic_img_ms);

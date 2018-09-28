@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/back_ground"
+    android:padding="@dimen/_14sdp">
+
+    <TextView
+        android:id="@+id/ss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_7sdp"
+        android:layout_marginStart="@dimen/_7sdp"
+        android:text="@string/save"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/_14ssp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!--<TextView-->
+    <!--android:id="@+id/text_file_path"-->
+    <!--android:layout_width="0dp"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_marginEnd="@dimen/_7sdp"-->
+    <!--android:layout_marginStart="@dimen/_7sdp"-->
+    <!--android:layout_marginTop="@dimen/_7sdp"-->
+    <!--android:ellipsize="end"-->
+    <!--android:maxLines="1"-->
+    <!--android:text="sssssss"-->
+    <!--android:textColor="@color/white"-->
+    <!--android:textSize="@dimen/font_size_small"-->
+    <!--app:layout_constraintEnd_toStartOf="@+id/iv_local_save"-->
+    <!--app:layout_constraintStart_toStartOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/ss" />-->
+
+    <!--<ImageView-->
+    <!--android:id="@+id/iv_local_save"-->
+    <!--android:layout_width="@dimen/icoin_local_save"-->
+    <!--android:layout_height="@dimen/icoin_local_save"-->
+    <!--android:layout_marginBottom="@dimen/_7sdp"-->
+    <!--android:layout_marginEnd="@dimen/_7sdp"-->
+    <!--android:layout_marginRight="@dimen/_7sdp"-->
+    <!--android:src="@drawable/ic_save"-->
+    <!--app:layout_constraintBottom_toTopOf="@+id/edt_name_file"-->
+    <!--app:layout_constraintEnd_toEndOf="parent"-->
+    <!--app:layout_constraintTop_toBottomOf="@+id/ss" />-->
+
+    <EditText
+        android:id="@+id/edt_name_file"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_7sdp"
+        android:layout_marginStart="@dimen/_7sdp"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:maxLines="3"
+        android:textColor="#fff"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ss" />
+
+    <TextView
+        android:id="@+id/btn_local_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_7sdp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:paddingBottom="@dimen/_7sdp"
+        android:paddingLeft="@dimen/_14ssp"
+        android:paddingRight="@dimen/_14ssp"
+        android:paddingTop="@dimen/_7sdp"
+        android:text="@string/ok"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:textAllCaps="true"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_local_cancel"
+        app:layout_constraintTop_toBottomOf="@+id/edt_name_file"
+        tools:ignore="RtlHardcoded" />
+
+    <TextView
+        android:id="@+id/btn_local_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_7sdp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:padding="@dimen/_7sdp"
+        android:text="@string/cancel"
+        android:textAllCaps="true"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edt_name_file"
+        tools:ignore="RtlHardcoded" />
+</android.support.constraint.ConstraintLayout>
