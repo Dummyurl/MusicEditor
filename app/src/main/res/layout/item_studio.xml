@@ -95,7 +95,7 @@
             android:layout_height="@dimen/_25sdp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/_14sdp"
+            android:layout_marginRight="@dimen/_7sdp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:padding="@dimen/_3sdp"
             android:src="@drawable/ic_more"

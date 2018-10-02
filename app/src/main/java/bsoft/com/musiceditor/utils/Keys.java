@@ -23,4 +23,5 @@ public class Keys {
     public static final int STUDIO_RECORDER = 3;
     public static final String UPDATE_SELECT_SONG ="update_select_song" ;
     public static final String LIST_SONG ="list__song" ;
+    public static final String UPDATE_LIST_STUDIO ="update_list_studio" ;
 }

@@ -69,8 +69,8 @@ public class StudioConverterFragment extends BaseFragment implements AudioAdapte
     }
 
     @Override
-    public void onLongClick(int index) {
-
+    public boolean onLongClick(int index) {
+        return false;
     }
 
     @Override

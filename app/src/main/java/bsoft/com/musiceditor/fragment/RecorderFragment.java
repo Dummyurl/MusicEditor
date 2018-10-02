@@ -1,7 +1,10 @@
 package bsoft.com.musiceditor.fragment;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,6 +37,7 @@ import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.Utils;
 
 import static bsoft.com.musiceditor.utils.Keys.START_SERVICE;
+import static bsoft.com.musiceditor.utils.Keys.STOP_RECORD;
 import static bsoft.com.musiceditor.utils.Keys.STOP_SERVICE;
 
 public class RecorderFragment extends BaseFragment implements QualityAdapter.OnClick, FormatAdapter.OnClick {
@@ -50,6 +54,22 @@ public class RecorderFragment extends BaseFragment implements QualityAdapter.OnC
     public static String sFormat = ".mp3";
     private boolean isRecording = false;
     private IVisualizerView iVisualizerView;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent != null && intent.getAction() != null) {
+
+                switch (intent.getAction()) {
+                    case STOP_RECORD:
+                        ivRecord.setImageResource(R.drawable.ic_play_arrow_white);
+                        break;
+                }
+
+            }
+        }
+    };
 
     @Override
     public void initViews() {
@@ -86,6 +106,8 @@ public class RecorderFragment extends BaseFragment implements QualityAdapter.OnC
 
         ivRecord.setOnClickListener(v -> addPermission());
         ivSaveRecord.setOnClickListener(v -> saveRecord());
+
+        getContext().registerReceiver(receiver, new IntentFilter(STOP_RECORD));
 
     }
 

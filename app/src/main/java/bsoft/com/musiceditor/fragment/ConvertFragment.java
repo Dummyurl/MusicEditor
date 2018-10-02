@@ -65,7 +65,7 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
     private MediaPlayer mediaPlayer;
     private String bitrate[] = {"128k", "160k", "192k", "256k", "320k"};
     private String bitrateSelected = "128k";
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH_mm_ss", Locale.US);
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US);
     private String formatSelected = ".mp3";
     private String format[] = {".mp3", ".wav", ".m4a", ".aac"};
     private FFmpeg ffmpeg;
@@ -226,11 +226,11 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
         alertDialog.show();
     }
 
-    private String localSavePath;
 
-    @SuppressLint("SetTextI18n")
     private void dialogSelectLocalSaveFile() {
+
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_save_file, null);
+
         createDialog(view);
 
         view.findViewById(R.id.btn_local_ok).setOnClickListener(v -> convertAudio());
@@ -238,6 +238,9 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
 
         edtNameFile = view.findViewById(R.id.edt_name_file);
         edtNameFile.setText("AC_" + simpleDateFormat.format(System.currentTimeMillis()));
+
+        playAudio();
+
     }
 
     private void cancelConvertAudio() {
@@ -280,8 +283,7 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
     private void initActions() {
         seekBar.setOnSeekBarChangeListener(this);
         ivPlay.setOnClickListener(v -> playAudio());
-        findViewById(R.id.view_seekbar).setOnClickListener(view -> {
-        });
+        findViewById(R.id.view_seekbar).setOnClickListener(view -> {});
         findViewById(R.id.iv_convert).setOnClickListener(v -> dialogSelectLocalSaveFile());
     }
 

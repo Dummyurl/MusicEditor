@@ -100,8 +100,8 @@ public class StudioRecorderFragment extends BaseFragment implements AudioAdapter
     }
 
     @Override
-    public void onLongClick(int index) {
-
+    public boolean onLongClick(int index) {
+        return false;
     }
 
     @Override

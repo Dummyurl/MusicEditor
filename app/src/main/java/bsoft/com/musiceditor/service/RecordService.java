@@ -45,6 +45,7 @@ import bsoft.com.musiceditor.utils.MyApplication;
 import bsoft.com.musiceditor.utils.SharedPrefs;
 import bsoft.com.musiceditor.utils.Utils;
 import ca.uol.aig.fftpack.RealDoubleFFT;
+
 import static bsoft.com.musiceditor.fragment.RecorderFragment.sFormat;
 import static bsoft.com.musiceditor.fragment.RecorderFragment.sQuality;
 import static bsoft.com.musiceditor.utils.Keys.STOP_SERVICE;
@@ -205,10 +206,6 @@ public class RecordService extends Service {
     }
 
     private void setFormat() {
-//        FORMAT = SharedPrefs.getInstance().get(_FORMAT, String.class, "");
-//        if (FORMAT.equals("")) {
-//            FORMAT = Utils.FORMAT_MP3;
-//        }
         FORMAT = sFormat;
     }
 
@@ -231,6 +228,7 @@ public class RecordService extends Service {
 
     private void readSizeFile() {
         File f = new File(String.valueOf(Uri.parse(mFilePath)));
+
         double Filesize = getFolderSize(f) / 1024;
 
         if (Filesize >= 1000) {
@@ -286,13 +284,13 @@ public class RecordService extends Service {
         Date date = new Date(timeAddRecord);
 
 
-        String lasmod = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.US).format(date);
+        String lasmod = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(date);
 
         File f;
         do {
             String filePath = SharedPrefs.getInstance().get("LocalSaveFile", String.class, null);
 
-            mFileName = lasmod + "_" + bitRate + "kbs" + FORMAT;
+            mFileName = "AR_" + lasmod + "_" + bitRate + "kbs" + FORMAT;
 
             if (filePath == null) {
                 mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();

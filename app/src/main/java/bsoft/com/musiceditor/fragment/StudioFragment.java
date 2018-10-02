@@ -131,7 +131,7 @@ public class StudioFragment extends BaseFragment {
 
     private void addTabFragment() {
 
-        studioAdapter = new StudioAdapter(getFragmentManager());
+        studioAdapter = new StudioAdapter(getChildFragmentManager());
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPager.setAdapter(studioAdapter);

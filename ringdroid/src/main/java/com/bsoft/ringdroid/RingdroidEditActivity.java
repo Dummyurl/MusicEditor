@@ -1184,6 +1184,8 @@ public class RingdroidEditActivity extends AppCompatActivity implements MarkerVi
         values.put(MediaStore.Audio.Media.IS_MUSIC, mNewFileKind == FileSaveDialog.FILE_KIND_MUSIC);
         values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis());
 
+
+
         // Insert it into the database
         Uri uri = MediaStore.Audio.Media.getContentUriForPath(outPath);
         final Uri newUri = getContentResolver().insert(uri, values);

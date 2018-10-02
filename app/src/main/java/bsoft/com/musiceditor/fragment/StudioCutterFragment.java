@@ -1,8 +1,11 @@
 package bsoft.com.musiceditor.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -14,6 +17,7 @@ import android.support.design.widget.BottomSheetDialog;
 import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +31,7 @@ import android.widget.Toast;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import bsoft.com.musiceditor.BuildConfig;
@@ -43,6 +48,7 @@ import static bsoft.com.musiceditor.utils.Utils.FORMAT_MP3;
 import static bsoft.com.musiceditor.utils.Utils.FORMAT_OGG;
 import static bsoft.com.musiceditor.utils.Utils.FORMAT_WAV;
 import static bsoft.com.musiceditor.utils.Utils.deleteAudio;
+import static bsoft.com.musiceditor.utils.Utils.getFileExtension;
 
 public class StudioCutterFragment extends BaseFragment implements AudioAdapter.OnClick {
     private List<AudioEntity> audioEntities = new ArrayList<>();
@@ -55,6 +61,26 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
     private EditText edtRename;
     private String CHECK_CURRENT_FRAGMENT;
     private int indexOption;
+
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent != null && intent.getAction() != null) {
+
+                switch (intent.getAction()) {
+
+                    case Keys.UPDATE_LIST_STUDIO:
+
+                        //updateList();
+
+                        break;
+
+                }
+
+            }
+        }
+    };
 
     public static StudioCutterFragment newInstance(Bundle bundle) {
         StudioCutterFragment fragment = new StudioCutterFragment();
@@ -69,15 +95,26 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
         listAllAudio.clear();
         listAllAudio.addAll(Utils.getAudioConvert(getContext(), CHECK_CURRENT_FRAGMENT));
-
         audioEntities.clear();
         audioEntities.addAll(listAllAudio);
+
+        Collections.reverse(audioEntities);
+
         adapter = new AudioAdapter(audioEntities, getContext(), this, true);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
         rvAudio = (RecyclerView) findViewById(R.id.rv_audio);
         rvAudio.setHasFixedSize(true);
-        rvAudio.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvAudio.setLayoutManager(linearLayoutManager);
         rvAudio.setAdapter(adapter);
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvAudio.getContext(),
+                linearLayoutManager.getOrientation());
+
+        rvAudio.addItemDecoration(dividerItemDecoration);
+
+        getContext().registerReceiver(receiver, new IntentFilter(Keys.UPDATE_LIST_STUDIO));
 
     }
 
@@ -99,14 +136,18 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
     }
 
     @Override
-    public void onLongClick(int index) {
-
+    public boolean onLongClick(int index) {
+        deleteRecord();
+        return true;
     }
 
     @Override
     public void onOptionClick(int index) {
+
         indexOption = index;
+
         showBottomSheet(indexOption);
+
     }
 
     private void showBottomSheet(int index) {
@@ -114,6 +155,7 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_option_bottom, null);
 
         TextView tvTitle = view.findViewById(R.id.btn_title);
+
         tvTitle.setText(audioEntities.get(index).getNameAudio());
 
         view.findViewById(R.id.btn_share).setOnClickListener(v -> shareRecord());
@@ -129,9 +171,11 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
     private void openFileRecord() {
         Uri uri;
+
         AudioEntity audioEntity = audioEntities.get(indexOption);
 
         Intent intent = new Intent();
+
         intent.setAction(Intent.ACTION_VIEW);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -141,6 +185,7 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
         }
 
         intent.setDataAndType((uri), "audio/*");
+
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         startActivity(intent);
@@ -152,43 +197,51 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
     private void renameAudio() {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_rename, null);
+
         createDialog(view);
 
         edtRename = view.findViewById(R.id.edtRename);
 
         view.findViewById(R.id.btnYes).setOnClickListener(v -> {
 
-            alertDialog.dismiss();
+            if (edtRename.getText().toString().trim().isEmpty()) {
+                Toast.makeText(getContext(), getString(R.string.file_name_empty), Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             String tailFile;
 
+            File currentFile, newFile;
+
             AudioEntity audioEntity = audioEntities.get(indexOption);
 
-            File file = new File(audioEntity.getPath());
+            tailFile = "." + getFileExtension(audioEntity.getPath());
 
-            if (file.getName().contains(FORMAT_MP3)) {
-                tailFile = FORMAT_MP3;
-            } else if (file.getName().contains(FORMAT_M4A)) {
-                tailFile = FORMAT_M4A;
-            } else if (file.getName().contains(FORMAT_AAC)) {
-                tailFile = FORMAT_AAC;
-            } else if (file.getName().contains(FORMAT_WAV)) {
-                tailFile = FORMAT_WAV;
-            } else {
-                tailFile = FORMAT_MP3;
-            }
-
-            File currentFile, newFile;
             currentFile = new File(audioEntity.getPath());
+
             newFile = new File(audioEntity.getPath().replace(audioEntity.getNameAudio(), "") + edtRename.getText().toString().trim() + tailFile);
 
-            rename(currentFile, newFile);
-            renameContentProvider(edtRename.getText().toString().trim(), tailFile, audioEntity);
-            updateList();
+            if (newFile.exists()) {
+                Toast.makeText(getContext(), getString(R.string.name_file_exist), Toast.LENGTH_SHORT).show();
 
+            } else {
+
+                rename(currentFile, newFile);
+                renameContentProvider(edtRename.getText().toString().trim(), tailFile, audioEntity);
+                updateList();
+
+                Log.e("xxx", "Cccccccccccc");
+
+                alertDialog.dismiss();
+            }
         });
 
         view.findViewById(R.id.btnNo).setOnClickListener(v -> alertDialog.dismiss());
+
+        if (bottomSheetDialog != null) {
+            bottomSheetDialog.dismiss();
+        }
+
     }
 
 
@@ -207,13 +260,16 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
         try {
             int result = contentResolver.update(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values, MediaStore.Audio.Media.DATA + " = ?", new String[]{f.getAbsolutePath()});
+
         } catch (Exception e) {
+
             Toast.makeText(getContext(), getString(R.string.fail_rename), Toast.LENGTH_SHORT).show();
         }
 
-        if (null != cursor) {
+        if (cursor != null) {
             cursor.close();
         }
+
     }
 
     private void createDialog(View view) {
@@ -250,6 +306,14 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
     }
 
+    @Override
+    public void onDetach() {
+
+        getContext().unregisterReceiver(receiver);
+
+        super.onDetach();
+    }
+
     private void dismissDetail() {
         alertDialog.dismiss();
     }
@@ -259,8 +323,14 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
         listAllAudio.addAll(Utils.getAudioConvert(getContext(), Keys.DIR_CUTTER));
         audioEntities.clear();
         audioEntities.addAll(listAllAudio);
-        adapter.notifyDataSetChanged();
-        bottomSheetDialog.dismiss();
+
+        Collections.reverse(audioEntities);
+
+        adapter.setFilter(audioEntities);
+
+        if (bottomSheetDialog != null) {
+            bottomSheetDialog.dismiss();
+        }
     }
 
     private void deleteRecord() {

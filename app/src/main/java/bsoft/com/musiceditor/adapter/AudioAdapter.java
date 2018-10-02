@@ -22,6 +22,9 @@ import bsoft.com.musiceditor.utils.Utils;
 
 import static bsoft.com.musiceditor.utils.Utils.CONVERT_LONG_TO_DATE;
 import static bsoft.com.musiceditor.utils.Utils.convertDate;
+import static bsoft.com.musiceditor.utils.Utils.convertMillisecond;
+import static bsoft.com.musiceditor.utils.Utils.getFileExtension;
+import static bsoft.com.musiceditor.utils.Utils.getStringSizeLengthFile;
 
 public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> {
 
@@ -36,7 +39,6 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         this.context = context;
         this.isStudio = isStudio;
     }
-
 
 
     @NonNull
@@ -64,7 +66,10 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
         if (isStudio) {
 
             holder.tvNameSong.setText(audioEntity.getNameAudio());
-            holder.tvNameArtist.setText(convertDate(audioEntity.getDateModifier(),CONVERT_LONG_TO_DATE));
+            holder.tvNameArtist.setText(convertDate(audioEntity.getDateModifier(), CONVERT_LONG_TO_DATE));
+            holder.tvTimeSizeFormat.setText(getStringSizeLengthFile(audioEntity.getSize())
+                    + "  " + getFileExtension(audioEntity.getPath())
+                    + "  " + convertMillisecond(Long.parseLong(audioEntity.getDuration())));
 
             RequestOptions options = new RequestOptions();
             options.error(R.drawable.ic_img_ms);
@@ -75,7 +80,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
 
             holder.tvNameSong.setText(audioEntity.getNameAudio());
             holder.tvNameArtist.setText(audioEntity.getNameArtist());
-            holder.tvDuration.setText(Utils.convertMillisecond(Long.parseLong(audioEntity.getDuration())));
+            holder.tvDuration.setText(convertMillisecond(Long.parseLong(audioEntity.getDuration())));
 
             RequestOptions options = new RequestOptions();
             options.error(R.drawable.ic_img_ms);
@@ -105,6 +110,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
                 ivMore = itemView.findViewById(R.id.iv_more);
 
                 ivMore.setOnClickListener(v -> callback.onOptionClick(getAdapterPosition()));
+                itemView.setOnLongClickListener(v -> callback.onLongClick(getAdapterPosition()));
             } else {
                 tvNameSong = itemView.findViewById(R.id.name_song);
                 tvNameArtist = itemView.findViewById(R.id.name_artist);
@@ -119,7 +125,7 @@ public class AudioAdapter extends RecyclerView.Adapter<AudioAdapter.ViewHolder> 
     public interface OnClick {
         void onClick(int index);
 
-        void onLongClick(int index);
+        boolean onLongClick(int index);
 
         void onOptionClick(int index);
     }

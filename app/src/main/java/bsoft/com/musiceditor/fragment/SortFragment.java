@@ -1,6 +1,7 @@
 package bsoft.com.musiceditor.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,6 +13,11 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
+import com.github.hiteshsondhi88.libffmpeg.ExecuteBinaryResponseHandler;
+import com.github.hiteshsondhi88.libffmpeg.FFmpeg;
+import com.github.hiteshsondhi88.libffmpeg.exceptions.FFmpegCommandAlreadyRunningException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +28,7 @@ import bsoft.com.musiceditor.adapter.SimpleItemTouchHelperCallback;
 import bsoft.com.musiceditor.adapter.SortAdapter;
 import bsoft.com.musiceditor.listener.IListSongChanged;
 import bsoft.com.musiceditor.model.AudioEntity;
+import bsoft.com.musiceditor.utils.Flog;
 import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.Utils;
 
@@ -42,6 +49,8 @@ public class SortFragment extends BaseFragment implements IListSongChanged, Sort
     @Override
     public void initViews() {
 
+        ffmpeg = FFmpeg.getInstance(getContext());
+
         audioEntities = getArguments().getParcelableArrayList(Keys.LIST_SONG);
         audioAdapter = new SortAdapter(audioEntities, getContext(), this, this);
 
@@ -51,6 +60,7 @@ public class SortFragment extends BaseFragment implements IListSongChanged, Sort
         rvAudio.setAdapter(audioAdapter);
 
         callback = new SimpleItemTouchHelperCallback(audioAdapter);
+
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvAudio);
 
@@ -64,8 +74,13 @@ public class SortFragment extends BaseFragment implements IListSongChanged, Sort
         toolbar.setTitle(R.string.sort);
         toolbar.setNavigationOnClickListener(v -> getFragmentManager().popBackStack());
         toolbar.inflateMenu(R.menu.menu_merger);
-        toolbar.getMenu().findItem(R.id.item_ads).setOnMenuItemClickListener(item -> true);
+        toolbar.getMenu().findItem(R.id.item_ads).setOnMenuItemClickListener(item -> mergerAudio());
 
+    }
+
+    private boolean mergerAudio() {
+        String command[] = new String[]{};
+        return true;
     }
 
     @Nullable
@@ -82,5 +97,47 @@ public class SortFragment extends BaseFragment implements IListSongChanged, Sort
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
+    }
+
+    private FFmpeg ffmpeg;
+
+    private void execFFmpegBinary(final String[] command, String path, String title) {
+        Log.e("xxx", "cccccccccccccc");
+        try {
+            ffmpeg.execute(command, new ExecuteBinaryResponseHandler() {
+                @Override
+                public void onFailure(String s) {
+
+                    Flog.e("xxx", "FAILED with output: " + s);
+                }
+
+                @Override
+                public void onSuccess(String s) {
+                    Flog.e("xxx", "Success " + s);
+
+                }
+
+                @Override
+                public void onProgress(String s) {
+                    Log.e("xxx", s);
+
+                }
+
+                @Override
+                public void onStart() {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    Flog.e("xxx", "Success finish ");
+
+                }
+            });
+
+        } catch (FFmpegCommandAlreadyRunningException e) {
+            e.printStackTrace();
+            Log.e("xxx", "ccccxxxxxxxxxxxxxxxxxxxxxcccccccccc");
+        }
     }
 }

@@ -40,6 +40,17 @@ public class SelectFileMergerFragment extends BaseFragment implements SelectSong
     }
 
     @Override
+    public void onDestroy() {
+
+        if (searchView != null) {
+            searchView.clearFocus();
+        }
+
+        super.onDestroy();
+
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_details_select_folder, container, false);
         return view;
@@ -56,25 +67,27 @@ public class SelectFileMergerFragment extends BaseFragment implements SelectSong
     }
 
     private void getList() {
-        if (listChecked.size() > 0) {
-//            getFragmentManager().popBackStack();
-//            getContext().sendBroadcast(new Intent(Keys.UPDATE_SELECT_SONG)
-//                    .putParcelableArrayListExtra(Keys.LIST_SONG, (ArrayList<? extends Parcelable>) listChecked));
+
+        if (listChecked.size() == 0) {
+
+            Toast.makeText(getContext(), getString(R.string.please_choose_file), Toast.LENGTH_SHORT).show();
+
+        } else {
 
             Bundle bundle = new Bundle();
+
             bundle.putParcelableArrayList(Keys.LIST_SONG, (ArrayList<? extends Parcelable>) listChecked);
 
             getFragmentManager().beginTransaction()
                     .add(R.id.view_container, SortFragment.newInstance(bundle))
                     .addToBackStack(null)
                     .commit();
-        } else {
-            Toast.makeText(getContext(), getString(R.string.please_choose_file), Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void initViews() {
+
         initToolbar();
 
         audioEntityList = Utils.getSongFromDevice(getContext());

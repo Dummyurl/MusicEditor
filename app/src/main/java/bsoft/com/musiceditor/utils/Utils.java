@@ -53,6 +53,16 @@ public class Utils {
 
     private static Pattern pattern = Pattern.compile("time=([\\d\\w:]+)");
 
+
+    public static String getFileExtension(String path) {
+
+        int lastIndexOf = path.lastIndexOf(".");
+        if (lastIndexOf == -1) {
+            return ""; // empty extension
+        }
+        return path.substring(lastIndexOf + 1);
+    }
+
     public static List<AudioEntity> filterSong(List<AudioEntity> songList, String query) {
         String s = Utils.unAccent(query.toLowerCase());
         List<AudioEntity> filteredModelList = new ArrayList<>();
@@ -76,8 +86,10 @@ public class Utils {
         values.put(MediaStore.Audio.Media.ARTIST, "<unknow>");
         values.put(MediaStore.Audio.Media.DATA, new File(path).getAbsolutePath());
         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
-        values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis());
+        values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis() + "");
         values.put(MediaStore.Audio.Media.SIZE, new File(path).length());
+
+        Log.e("xxx", Utils.convertDate(String.valueOf(System.currentTimeMillis()), Utils.CONVERT_LONG_TO_DATE) + "_____" + System.currentTimeMillis());
 
         Uri newUri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
 
@@ -309,12 +321,16 @@ public class Utils {
                 String imagePath = ContentUris.withAppendedId(ART_CONTENT_URI, albumId).toString();
                 long size = c.getLong(c.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-                AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier);
+
+                AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier + "000");
                 audio.setSize(size);
 
                 try {
                     if (duration != null && Long.parseLong(duration) > 0 && path.contains(selection)) {
                         mListSong.add(audio);
+                        Log.e("xxx", "date " +
+                                dateModifier);
+
                     }
                 } catch (Exception e) {
 
