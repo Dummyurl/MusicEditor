@@ -9,6 +9,15 @@
         <item name="colorControlHighlight">@color/high_light</item>
     </style>
 
+    <style name="CommonTextContent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">@dimen/font_size_standard</item>
+        <item name="android:maxLines">10</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">#fff</item>
+    </style>
+
     <style name="Text">
         <item name="android:paddingRight">@dimen/_5sdp</item>
         <item name="android:paddingLeft">@dimen/_5sdp</item>
@@ -19,6 +28,36 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:maxLines">2</item>
         <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="button_detail">
+        <item name="android:textSize">@dimen/_14ssp</item>
+        <item name="android:drawablePadding">@dimen/_14sdp</item>
+        <item name="android:paddingLeft">@dimen/_14sdp</item>
+        <item name="android:gravity">left|center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/_40sdp</item>
+        <item name="android:textColor">#fff</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="MyCheckBox" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+    </style>
+
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!--item RadioButton or CheckBox color-->
+        <item name="android:background">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorAccent</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <!--item text color-->
+        <item name="textColorAlertDialogListItem">#fff</item>-->
+
+        <!--buttons color-->
+        <item name="colorAccent">@color/colorAccent</item>
+        <!--title and message color-->
+        <item name="android:textColorPrimary">#fff</item>
     </style>
 
     <style name="BG_Icon_Main">

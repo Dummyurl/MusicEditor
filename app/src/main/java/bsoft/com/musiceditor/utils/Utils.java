@@ -12,6 +12,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.inputmethod.InputMethodManager;
 
@@ -19,6 +20,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,12 +47,27 @@ public class Utils {
     public static final String FORMAT_FLV = ".flv";
     public static final String PREFERENCE_URI = "copy_utils";
     public static final String AUDIO_ENTITY = "audio_entity";
-    public static final String BITRATE_WAV ="bitrate_wav" ;
-    public static final String BITRATE_MP3 ="bitrate_mp3" ;
+    public static final String BITRATE_WAV = "bitrate_wav";
+    public static final String BITRATE_MP3 = "bitrate_mp3";
+    public static final String CONVERT_LONG_TO_DATE = "dd/MM/yyyy hh:mm:ss";
 
     private static Pattern pattern = Pattern.compile("time=([\\d\\w:]+)");
 
-    public static void addAudio(String path, String title,Context context) {
+    public static List<AudioEntity> filterSong(List<AudioEntity> songList, String query) {
+        String s = Utils.unAccent(query.toLowerCase());
+        List<AudioEntity> filteredModelList = new ArrayList<>();
+
+        for (AudioEntity song : songList) {
+            String text = Utils.unAccent(song.getNameAudio().toLowerCase());
+            if (text.contains(s)) {
+                filteredModelList.add(song);
+            }
+        }
+        return filteredModelList;
+    }
+
+
+    public static void addAudio(String path, String title, Context context) {
         ContentValues values = new ContentValues();
         values.put(MediaStore.Audio.Media.DURATION, Utils.getMediaDuration(path));
         values.put(MediaStore.Audio.Media.TITLE, title);
@@ -59,6 +76,8 @@ public class Utils {
         values.put(MediaStore.Audio.Media.ARTIST, "<unknow>");
         values.put(MediaStore.Audio.Media.DATA, new File(path).getAbsolutePath());
         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+        values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis());
+        values.put(MediaStore.Audio.Media.SIZE, new File(path).length());
 
         Uri newUri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
 
@@ -226,6 +245,8 @@ public class Utils {
 
                 albumId = c.getInt(c.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
                 dateModifier = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
+                //Log.e("xxx", convertDate(String.valueOf(System.currentTimeMillis()), "dd/MM/yyyy hh:mm:ss"));
+
                 String imagePath = ContentUris.withAppendedId(ART_CONTENT_URI, albumId).toString();
 
                 AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier);
@@ -243,11 +264,17 @@ public class Utils {
             } while (c.moveToNext());
         }
 
-        c.close();
+        if (c != null) {
+            c.close();
+        }
         return mListSong;
     }
 
-    public static List<AudioEntity> getAudioConvert(Context context) {
+    public static String convertDate(String dateInMilliseconds, String dateFormat) {
+        return DateFormat.format(dateFormat, Long.parseLong(dateInMilliseconds)).toString();
+    }
+
+    public static List<AudioEntity> getAudioConvert(Context context, String selection) {
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Uri ART_CONTENT_URI = Uri.parse("content://media/external/audio/albumart");
         List<AudioEntity> mListSong = new ArrayList<>();
@@ -258,7 +285,8 @@ public class Utils {
                 MediaStore.Audio.Media.DURATION,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.ALBUM_ID,
-                MediaStore.Audio.Media.DATE_MODIFIED
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.SIZE
         };
 
         Cursor c = context.getContentResolver().query(uri, m_data, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
@@ -277,14 +305,15 @@ public class Utils {
                 duration = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
                 albumId = c.getInt(c.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                dateModifier = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED));
+                dateModifier = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
                 String imagePath = ContentUris.withAppendedId(ART_CONTENT_URI, albumId).toString();
+                long size = c.getLong(c.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
                 AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier);
+                audio.setSize(size);
 
                 try {
-
-                    if (duration != null && Long.parseLong(duration) > 0 && path.contains("/Converter")) {
+                    if (duration != null && Long.parseLong(duration) > 0 && path.contains(selection)) {
                         mListSong.add(audio);
                     }
                 } catch (Exception e) {

@@ -17,11 +17,13 @@ import java.util.List;
 import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.adapter.AudioAdapter;
 import bsoft.com.musiceditor.model.AudioEntity;
+import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.Utils;
 
 public class StudioConverterFragment extends BaseFragment implements AudioAdapter.OnClick {
 
     private List<AudioEntity> audioEntities = new ArrayList<>();
+    private List<AudioEntity> listAllAudio = new ArrayList<>();
     private AudioAdapter adapter;
     private RecyclerView rvAudio;
 
@@ -33,13 +35,20 @@ public class StudioConverterFragment extends BaseFragment implements AudioAdapte
         return fragment;
     }
 
+    public void beginSearch(String s) {
+        audioEntities = Utils.filterAudioEnity(listAllAudio, s);
+        adapter.setFilter(audioEntities);
+    }
+
     @Override
     public void initViews() {
 
+        listAllAudio.clear();
+        listAllAudio.addAll(Utils.getAudioConvert(getContext(), Keys.DIR_CONVERTER));
+
         audioEntities.clear();
-        audioEntities.addAll(Utils.getAudioConvert(getContext()));
-        Log.e("xxx", " sizzzzzz" + audioEntities.size());
-        adapter = new AudioAdapter(audioEntities, getContext(), this);
+        audioEntities.addAll(listAllAudio);
+        adapter = new AudioAdapter(audioEntities, getContext(), this, true);
 
         rvAudio = (RecyclerView) findViewById(R.id.rv_audio);
         rvAudio.setHasFixedSize(true);
@@ -61,6 +70,11 @@ public class StudioConverterFragment extends BaseFragment implements AudioAdapte
 
     @Override
     public void onLongClick(int index) {
+
+    }
+
+    @Override
+    public void onOptionClick(int index) {
 
     }
 }

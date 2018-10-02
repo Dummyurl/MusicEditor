@@ -24,4 +24,25 @@
     <string name="record">Record</string>
     <string name="recording">Recording...</string>
     <string name="stopRecord">Stopped record!</string>
+    <string name="cutter">Cutter</string>
+    <string name="merger">Merger</string>
+    <string name="create_file">Create file</string>
+    <string name="detail">Detail</string>
+    <string name="delete_file">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="set_as">Set as ringtone</string>
+    <string name="open_file_with">Open file with</string>
+    <string name="title_audio">Title</string>
+    <string name="path">Path</string>
+    <string name="duration">Duration</string>
+    <string name="size">Size</string>
+    <string name="date_time">Date time</string>
+    <string name="fail_rename">Rename failed!</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="delete_this_record">Are you sure want to delete this file?</string>
+    <string name="select_file">Select file</string>
+    <string name="sort">Sort</string>
+    <string name="ad_banner_id">@string/lib_crs_admob_banner_id</string>
+    <string name="please_choose_file">Please choose files you want to merger!</string>
 </resources>

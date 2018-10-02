@@ -21,7 +21,6 @@ import android.os.Message;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.provider.DocumentFile;
-import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -40,14 +39,16 @@ import java.util.Locale;
 
 import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.activity.MainActivity;
-import bsoft.com.musiceditor.fragment.RecordFragment;
+import bsoft.com.musiceditor.fragment.RecorderFragment;
 import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.MyApplication;
 import bsoft.com.musiceditor.utils.SharedPrefs;
 import bsoft.com.musiceditor.utils.Utils;
 import ca.uol.aig.fftpack.RealDoubleFFT;
-
+import static bsoft.com.musiceditor.fragment.RecorderFragment.sFormat;
+import static bsoft.com.musiceditor.fragment.RecorderFragment.sQuality;
 import static bsoft.com.musiceditor.utils.Keys.STOP_SERVICE;
+import static bsoft.com.musiceditor.utils.Utils.addAudio;
 
 public class RecordService extends Service {
     private static final int NOTIFICATION_ID_CUSTOM_BIG = 9;
@@ -94,7 +95,6 @@ public class RecordService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-       // SharedPrefs.getInstance().put(Utils.AUDIO_ENTITY, Keys.DIR_APP);
     }
 
     @Override
@@ -192,7 +192,7 @@ public class RecordService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext()
                 , 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext());
 
         notificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
@@ -205,10 +205,11 @@ public class RecordService extends Service {
     }
 
     private void setFormat() {
-        FORMAT = SharedPrefs.getInstance().get(_FORMAT, String.class, "");
-        if (FORMAT.equals("")) {
-            FORMAT = Utils.FORMAT_MP3;
-        }
+//        FORMAT = SharedPrefs.getInstance().get(_FORMAT, String.class, "");
+//        if (FORMAT.equals("")) {
+//            FORMAT = Utils.FORMAT_MP3;
+//        }
+        FORMAT = sFormat;
     }
 
     private void setOutBitrate() {
@@ -242,11 +243,11 @@ public class RecordService extends Service {
     }
 
     private void updateTime() {
-        if (RecordFragment.mHandler == null) {
-            RecordFragment.mHandler = new Handler();
+        if (RecorderFragment.mHandler == null) {
+            RecorderFragment.mHandler = new Handler();
         }
 
-        RecordFragment.mHandler.postDelayed(new Runnable() {
+        RecorderFragment.mHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (limitedTime != 0 && time == limitedTime) {
@@ -255,7 +256,7 @@ public class RecordService extends Service {
 
                     sendBroadcast(new Intent().setAction(Keys.STOP_RECORD));
 
-                    RecordFragment.mHandler.removeCallbacksAndMessages(null);
+                    RecorderFragment.mHandler.removeCallbacksAndMessages(null);
                     Toast.makeText(getApplicationContext(), getResources().getString(R.string.stopRecord), Toast.LENGTH_SHORT).show();
                     stopForeground(true);
                     stopSelf();
@@ -269,8 +270,8 @@ public class RecordService extends Service {
                     b.putString(Keys.FILE_SIZE, valueFile);
                     message.setData(b);
 
-                    RecordFragment.mHandler.sendMessage(message);
-                    RecordFragment.mHandler.postDelayed(this, 1000);
+                    RecorderFragment.mHandler.sendMessage(message);
+                    RecorderFragment.mHandler.postDelayed(this, 1000);
                     time = time + 1000;
                 }
             }
@@ -295,8 +296,8 @@ public class RecordService extends Service {
 
             if (filePath == null) {
                 mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-                mFileNomedia = mFilePath + "/BMusicEditor/";
-                mFilePath += "/BMusicEditor/" + mFileName;
+                mFileNomedia = mFilePath + "/" + Keys.DIR_APP + Keys.DIR_RECORDER;
+                mFilePath += Keys.DIR_APP + "/" + Keys.DIR_RECORDER + "/" + mFileName;
 
             } else {
                 mFileNomedia = filePath;
@@ -367,7 +368,7 @@ public class RecordService extends Service {
                 .setInSampleRate(inSamplerate)
                 .setOutChannels(1)
                 .setOutBitrate(bitRate)
-                .setOutSampleRate(inSamplerate)
+                .setOutSampleRate(sQuality)
                 .setAbrMeanBitrate(bitRate)
                 .build();
 
@@ -389,8 +390,8 @@ public class RecordService extends Service {
             }
             transformer.ft(toTransform);
 
-            if (RecordFragment.mHandler != null) {
-                RecordFragment.mHandler.sendMessage(RecordFragment.mHandler.obtainMessage(1, toTransform));
+            if (RecorderFragment.mHandler != null) {
+                RecorderFragment.mHandler.sendMessage(RecorderFragment.mHandler.obtainMessage(1, toTransform));
             }
 
             if (bytesRead > 0) {
@@ -408,7 +409,7 @@ public class RecordService extends Service {
             }
         }
 
-        RecordFragment.mHandler.removeCallbacksAndMessages(null);
+        RecorderFragment.mHandler.removeCallbacksAndMessages(null);
 
         int outputMp3buf = androidLame.flush(mp3buffer);
 
@@ -465,14 +466,14 @@ public class RecordService extends Service {
 //
 //            //Toast.makeText(getApplicationContext(), getString(R.string.file_is_too_small), Toast.LENGTH_SHORT).show();
 //        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && treePath != null) {
-                //mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, treePath);
-                Utils.addAudio(mFilePath, mFileName, getApplicationContext());
-                //Log.d("newp", treePath + " " + mFilePath);
-            } else {
-              //  mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, Utils.EMPTY);
-                Utils.addAudio(mFilePath, mFileName, getApplicationContext());
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && treePath != null) {
+            //mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, treePath);
+            addAudio(mFilePath, mFileName, getApplicationContext());
+            //Log.d("newp", treePath + " " + mFilePath);
+        } else {
+            //  mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, Utils.EMPTY);
+            addAudio(mFilePath, mFileName, getApplicationContext());
+        }
 
 
         //sendBroadcast(new Intent().setAction(Utils.UPDATE_LIST));

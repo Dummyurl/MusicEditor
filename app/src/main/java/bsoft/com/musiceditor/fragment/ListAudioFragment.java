@@ -1,6 +1,7 @@
 package bsoft.com.musiceditor.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,29 +16,43 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bsoft.ringdroid.RingdroidEditActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.adapter.AudioAdapter;
 import bsoft.com.musiceditor.model.AudioEntity;
+import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.Utils;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
 public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnClick {
+    private static final int AUDIO_CUTTER = 0;
     private RecyclerView rvAudio;
     private AudioAdapter adapter;
     private List<AudioEntity> audioEntityList = new ArrayList<>();
     private List<AudioEntity> listAllAudioEntity = new ArrayList<>();
     private SearchView searchView;
     private ProgressDialog dialogLoading;
+    private int CHECK_FRAGMENT = 0;
 
-    public static ListAudioFragment newInstance() {
-        Bundle args = new Bundle();
+    public static ListAudioFragment newInstance(Bundle bundle) {
         ListAudioFragment fragment = new ListAudioFragment();
-        fragment.setArguments(args);
+        fragment.setArguments(bundle);
         return fragment;
+    }
+
+    @Override
+    public void onDestroy() {
+
+        if (searchView != null) {
+            searchView.clearFocus();
+        }
+
+        super.onDestroy();
     }
 
     @Nullable
@@ -46,12 +61,15 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
         return inflater.inflate(R.layout.fragment_list_audio, container, false);
     }
 
+
     @Override
     public void initViews() {
 
+        CHECK_FRAGMENT = getArguments().getInt(Keys.TITLE, 0);
+
         audioEntityList = new ArrayList<>();
         audioEntityList.clear();
-        adapter = new AudioAdapter(audioEntityList, getContext(), this);
+        adapter = new AudioAdapter(audioEntityList, getContext(), this, false);
 
         rvAudio = (RecyclerView) findViewById(R.id.rv_audio);
         rvAudio.setHasFixedSize(true);
@@ -59,7 +77,9 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
         rvAudio.setAdapter(adapter);
 
         loadData();
+
         initToolbar();
+
     }
 
     private void initToolbar() {
@@ -69,22 +89,43 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
         toolbar.setNavigationOnClickListener(v -> getFragmentManager().popBackStack());
         toolbar.inflateMenu(R.menu.menu_search);
 
+        if (CHECK_FRAGMENT == AUDIO_CUTTER) {
+            toolbar.setTitle(getString(R.string.audio_cutter));
+        } else {
+            toolbar.setTitle(getString(R.string.converter));
+        }
+
         searchAudio(toolbar);
     }
 
     @Override
     public void onClick(int index) {
-
         AudioEntity audioEntity = audioEntityList.get(index);
 
-        Bundle bundle = new Bundle();
+        if (CHECK_FRAGMENT == AUDIO_CUTTER) {
 
-        bundle.putParcelable(Utils.AUDIO_ENTITY, audioEntity);
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_EDIT);
+            intent.putExtra(Keys.FILE_NAME, audioEntity.getPath());
+            intent.setClassName(getContext().getPackageName(), RingdroidEditActivity.class.getName());
 
-        getFragmentManager().beginTransaction()
-                .add(R.id.view_container, ConvertFragment.newInstance(bundle))
-                .addToBackStack(null)
-                .commit();
+            startActivityForResult(intent, 2);
+
+        } else {
+
+            Bundle bundle = new Bundle();
+            bundle.putParcelable(Utils.AUDIO_ENTITY, audioEntity);
+
+            getFragmentManager().beginTransaction()
+                    .setCustomAnimations(R.anim.animation_left_to_right
+                            , R.anim.animation_right_to_left
+                            , R.anim.animation_left_to_right
+                            , R.anim.animation_right_to_left)
+                    .add(R.id.view_container, ConvertFragment.newInstance(bundle))
+                    .addToBackStack(null)
+                    .commit();
+
+        }
     }
 
     private void searchAudio(Toolbar toolbar) {
@@ -108,7 +149,7 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
 
 
     private void loadData() {
-        dialogLoading = ProgressDialog.show(requireContext(), "", getString(R.string.loading), true);
+        dialogLoading = ProgressDialog.show(getContext(), "", getString(R.string.loading), true);
         dialogLoading.setCancelable(false);
         dialogLoading.show();
 
@@ -147,6 +188,11 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
 
     @Override
     public void onLongClick(int index) {
+
+    }
+
+    @Override
+    public void onOptionClick(int index) {
 
     }
 }

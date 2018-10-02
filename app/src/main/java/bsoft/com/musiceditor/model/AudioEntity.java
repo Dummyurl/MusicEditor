@@ -3,8 +3,9 @@ package bsoft.com.musiceditor.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-public class AudioEntity implements Parcelable {
+public class AudioEntity implements Parcelable, Comparable<AudioEntity> {
     private String id;
     private String nameAudio;
     private String nameArtist;
@@ -13,6 +14,17 @@ public class AudioEntity implements Parcelable {
     private String path;
     private int albumId;
     private String pathImage;
+    private String dateModifier;
+    private long size;
+    private boolean isCheck;
+
+    public long getSize() {
+        return size;
+    }
+
+    public void setSize(long size) {
+        this.size = size;
+    }
 
     public String getDateModifier() {
         return dateModifier;
@@ -22,7 +34,14 @@ public class AudioEntity implements Parcelable {
         this.dateModifier = dateModifier;
     }
 
-    private String dateModifier;
+
+    public boolean isCheck() {
+        return isCheck;
+    }
+
+    public void setCheck(boolean check) {
+        isCheck = check;
+    }
 
     public AudioEntity(String id, String nameAudio, String nameArtist, String nameAlbum, String duration, String path, int albumId, String pathImage, String date) {
         this.id = id;
@@ -46,6 +65,8 @@ public class AudioEntity implements Parcelable {
         path = source.readString();
         pathImage = source.readString();
         dateModifier = source.readString();
+        size = source.readLong();
+        isCheck = source.readByte() != 0;
     }
 
     public String getId() {
@@ -140,5 +161,12 @@ public class AudioEntity implements Parcelable {
         dest.writeInt(albumId);
         dest.writeString(pathImage);
         dest.writeString(dateModifier);
+        dest.writeLong(size);
+        dest.writeByte((byte) (isCheck ? 1 : 0));
+    }
+
+    @Override
+    public int compareTo(@NonNull AudioEntity audioEntity) {
+        return 0;
     }
 }

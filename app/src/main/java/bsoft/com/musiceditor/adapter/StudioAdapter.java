@@ -1,5 +1,6 @@
 package bsoft.com.musiceditor.adapter;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -8,6 +9,7 @@ import bsoft.com.musiceditor.fragment.StudioConverterFragment;
 import bsoft.com.musiceditor.fragment.StudioCutterFragment;
 import bsoft.com.musiceditor.fragment.StudioMergerFragment;
 import bsoft.com.musiceditor.fragment.StudioRecorderFragment;
+import bsoft.com.musiceditor.utils.Keys;
 
 public class StudioAdapter extends FragmentStatePagerAdapter {
 
@@ -30,16 +32,24 @@ public class StudioAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case INDEX_CUTTER:
-                return StudioCutterFragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putString(Keys.CHECK_STUDIO_FRAGMENT, Keys.DIR_APP + Keys.DIR_CUTTER);
+                return StudioCutterFragment.newInstance(bundle);
 
             case INDEX_MERGER:
-                return StudioMergerFragment.newInstance();
+                Bundle b1 = new Bundle();
+                b1.putString(Keys.CHECK_STUDIO_FRAGMENT, Keys.DIR_APP + Keys.DIR_MERGER);
+                return StudioCutterFragment.newInstance(b1);
 
             case INDEX_CONVERTER:
-                return StudioConverterFragment.newInstance();
+                Bundle b2 = new Bundle();
+                b2.putString(Keys.CHECK_STUDIO_FRAGMENT, Keys.DIR_APP + Keys.DIR_CONVERTER);
+                return StudioCutterFragment.newInstance(b2);
 
             case INDEX_RECORDER:
-                return StudioRecorderFragment.newInstance();
+                Bundle b3 = new Bundle();
+                b3.putString(Keys.CHECK_STUDIO_FRAGMENT, Keys.DIR_APP + Keys.DIR_RECORDER);
+                return StudioCutterFragment.newInstance(b3);
         }
         return null;
     }

@@ -17,6 +17,14 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title="@string/app_name"></android.support.v7.widget.Toolbar>
 
+    <FrameLayout
+        android:id="@+id/view_ads"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="@dimen/_10sdp"
+        app:layout_constraintBottom_toTopOf="@+id/v"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
     <LinearLayout
         android:id="@+id/v"
         android:layout_width="match_parent"
@@ -117,9 +125,11 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_5sdp"
         android:orientation="horizontal"
         android:weightSum="3"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/fl_ad_banner">
 
         <android.support.constraint.ConstraintLayout
             android:id="@+id/view_recorder"
@@ -210,8 +220,21 @@
         </android.support.constraint.ConstraintLayout>
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/fl_ad_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </FrameLayout>
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/view_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></android.support.constraint.ConstraintLayout>
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/fl_ad_banner"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

@@ -15,7 +15,7 @@ import bsoft.com.musiceditor.R;
 public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHolder> {
     private OnClick callback;
     private boolean isSetBitrate;
-    private int indexBitrate;
+    private int indexBitrate, indexQuality = 3;
     private Context context;
 
     public QualityAdapter(OnClick callback, boolean isSetBitrate, Context context) {
@@ -24,7 +24,7 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
         this.isSetBitrate = isSetBitrate;
     }
 
-    private String quality[] = new String[]{"Mono -11k", "Mono -16k", "Mono -22k", "Mono -44k"};
+    private String quality[] = new String[]{"Mono - 11k", "Mono - 16k", "Mono - 22k", "Mono -  44k"};
     private String bitrate[] = new String[]{"128kbs", "160kbs", "192kbs", "256kbs", "320kbs"};
 
     @NonNull
@@ -35,10 +35,17 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
         return new QualityAdapter.ViewHolder(itemView);
     }
 
-    public void setSelectBitrate(int index) {
-        indexBitrate = index;
-        notifyDataSetChanged();
+    public void setSelectBitrate(int index,boolean isSetBitrate) {
+        if (isSetBitrate) {
+            indexBitrate = index;
+            notifyDataSetChanged();
+        }else {
+            indexQuality = index;
+            notifyDataSetChanged();
+        }
     }
+
+
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
@@ -55,8 +62,15 @@ public class QualityAdapter extends RecyclerView.Adapter<QualityAdapter.ViewHold
 
 
         } else {
-            holder.tvQuality.setText(quality[position]);
-            holder.ivState.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
+            if (indexQuality == position) {
+                holder.tvQuality.setText(quality[position]);
+                holder.tvQuality.setTextColor(context.getResources().getColor(R.color.devider));
+                holder.ivState.setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
+            } else {
+                holder.tvQuality.setText(quality[position]);
+                holder.tvQuality.setTextColor(Color.WHITE);
+                holder.ivState.setImageResource(R.drawable.ic_radio_button_unchecked_black_24dp);
+            }
 
         }
     }

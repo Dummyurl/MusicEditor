@@ -197,6 +197,8 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
                             }
                         }, 500);
 
+                        Toast.makeText(getContext(), getString(R.string.create_file) + ": " + path, Toast.LENGTH_SHORT).show();
+
                     } else {
                         if (progressDialog == null) {
                             return;
@@ -228,7 +230,7 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
 
     @SuppressLint("SetTextI18n")
     private void dialogSelectLocalSaveFile() {
-        View view = getLayoutInflater().inflate(R.layout.dialog_save_file, null);
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.dialog_save_file, null);
         createDialog(view);
 
         view.findViewById(R.id.btn_local_ok).setOnClickListener(v -> convertAudio());
@@ -306,6 +308,7 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
             values.put(MediaStore.Audio.Media.IS_MUSIC, true);
             values.put(MediaStore.Audio.Media.DATA, path);
             values.put(MediaStore.Audio.Media.DURATION, Utils.getMediaDuration(path));
+            values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis());
 
             ContentResolver contentResolver = context.getContentResolver();
             Cursor cursor = contentResolver
@@ -456,17 +459,13 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
 
     @Override
     public void onItemClick(int index) {
-        bitrateAdapter.setSelectBitrate(index);
+        bitrateAdapter.setSelectBitrate(index, true);
         bitrateSelected = bitrate[index];
     }
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-        if (mediaPlayer == null) {
-            return;
-        } else {
-            mediaPlayer.seekTo(seekBar.getProgress());
-        }
+
     }
 
     @Override
@@ -476,6 +475,10 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
 
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-
+        if (mediaPlayer == null) {
+            return;
+        } else {
+            mediaPlayer.seekTo(seekBar.getProgress());
+        }
     }
 }

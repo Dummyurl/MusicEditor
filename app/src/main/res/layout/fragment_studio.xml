@@ -9,10 +9,11 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorToolbar"
         app:layout_scrollFlags="scroll|enterAlways|snap"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="@string/studio"></android.support.v7.widget.Toolbar>
+        app:title="@string/studio"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/viewPager"
@@ -27,11 +28,12 @@
         android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/back_ground"
+        android:background="#2e2f3d"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/colorAccent"
         app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        app:tabTextColor="#ffff" />
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabTextColor="#797878" />
 </android.support.constraint.ConstraintLayout>

@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/back_ground">
+    android:background="@color/back_ground"
+    android:clickable="true"
+    android:focusable="true">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -16,107 +18,138 @@
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:title="@string/recorder" />
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/view_equalizer"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_160sdp"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_marginRight="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:background="@color/colorToolbar"
-        android:padding="@dimen/_7sdp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <bsoft.com.musiceditor.custom.visualizer.VisualizerFullView
-            android:id="@+id/visualizer_fullview"
+
+        <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </android.support.constraint.ConstraintLayout>
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/_5sdp">
 
-    <ImageView
-        android:id="@+id/iv_record"
-        android:layout_width="@dimen/_60sdp"
-        android:layout_height="@dimen/_60sdp"
-        android:layout_marginTop="@dimen/_14sdp"
-        android:src="@drawable/ic_btn_pause"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view_equalizer" />
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/view_equalizer"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_160sdp"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginRight="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@color/colorToolbar"
+                android:padding="@dimen/_7sdp"
+                app:layout_constraintTop_toTopOf="parent">
 
-    <ImageView
-        android:id="@+id/iv_save"
-        android:layout_width="@dimen/_30sdp"
-        android:layout_height="@dimen/_30sdp"
-        android:layout_marginLeft="@dimen/_20sdp"
-        android:src="@drawable/ic_btn_save"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_record"
-        app:layout_constraintLeft_toRightOf="@+id/iv_record"
-        app:layout_constraintTop_toTopOf="@+id/iv_record" />
+                <bsoft.com.musiceditor.custom.visualizer.VisualizerFullView
+                    android:id="@+id/visualizer_fullview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </android.support.constraint.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/tv_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="@dimen/_20sdp"
-        android:text="00:10:00"
-        android:textColor="#fff"
-        app:layout_constraintBottom_toBottomOf="@+id/iv_record"
-        app:layout_constraintRight_toLeftOf="@+id/iv_record"
-        app:layout_constraintTop_toTopOf="@+id/iv_record" />
 
-    <View
-        android:id="@+id/iv_devider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/_15sdp"
-        android:background="@color/devider"
-        app:layout_constraintTop_toBottomOf="@+id/iv_record" />
+            <ImageView
+                android:id="@+id/iv_bg_play"
+                android:layout_width="@dimen/_60sdp"
+                android:layout_height="@dimen/_60sdp"
+                android:layout_marginTop="@dimen/_14sdp"
+                android:src="@drawable/ringdroid_bg_circle"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/view_equalizer" />
 
-    <TextView
-        android:id="@+id/tv_quality"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:text="@string/quality"
-        android:textColor="#fff"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_devider" />
+            <ImageView
+                android:id="@+id/iv_record"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/ic_play_arrow_white"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_bg_play"
+                app:layout_constraintLeft_toLeftOf="@+id/iv_bg_play"
+                app:layout_constraintRight_toRightOf="@+id/iv_bg_play"
+                app:layout_constraintTop_toTopOf="@+id/iv_bg_play" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_quality"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_5sdp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_quality" />
+            <ImageView
+                android:id="@+id/iv_save"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_marginLeft="@dimen/_20sdp"
+                android:src="@drawable/ic_btn_save"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_record"
+                app:layout_constraintLeft_toRightOf="@+id/iv_record"
+                app:layout_constraintTop_toTopOf="@+id/iv_record" />
 
-    <View
-        android:id="@+id/iv_devider1"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:background="@color/devider"
-        app:layout_constraintTop_toBottomOf="@+id/rv_quality" />
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/_20sdp"
+                android:text="00:00"
+                android:textColor="#fff"
+                android:textSize="@dimen/_13ssp"
+                app:layout_constraintBottom_toBottomOf="@+id/iv_record"
+                app:layout_constraintRight_toLeftOf="@+id/iv_record"
+                app:layout_constraintTop_toTopOf="@+id/iv_record" />
 
-    <TextView
-        android:id="@+id/tv_format"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/_15sdp"
-        android:layout_marginTop="@dimen/_10sdp"
-        android:text="@string/format"
-        android:textColor="#fff"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/iv_devider1" />
+            <View
+                android:id="@+id/iv_devider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:background="@color/devider"
+                app:layout_constraintTop_toBottomOf="@+id/iv_record" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rv_format"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_5sdp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_format">
+            <TextView
+                android:id="@+id/tv_quality"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/quality"
+                android:textColor="#fff"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_devider" />
 
-    </android.support.v7.widget.RecyclerView>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_quality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tv_quality" />
+
+            <View
+                android:id="@+id/iv_devider1"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:background="@color/devider"
+                app:layout_constraintTop_toBottomOf="@+id/rv_quality" />
+
+            <TextView
+                android:id="@+id/tv_format"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_15sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text="@string/format"
+                android:textColor="#fff"
+                android:textSize="@dimen/_12ssp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/iv_devider1" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rv_format"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                app:layout_constraintTop_toBottomOf="@+id/tv_format">
+
+            </android.support.v7.widget.RecyclerView>
+
+        </android.support.constraint.ConstraintLayout>
+
+    </ScrollView>
 
 
 </android.support.constraint.ConstraintLayout>
