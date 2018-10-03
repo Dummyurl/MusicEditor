@@ -3,10 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/back_ground"
     android:orientation="horizontal">
 
     <RelativeLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
@@ -21,14 +21,16 @@
             android:layout_height="@dimen/_40sdp"
             android:layout_centerVertical="true"
             android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_marginTop="@dimen/_5sdp">
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="@drawable/bg_image_sort">
 
             <ImageView
                 android:id="@+id/iv_sort"
-                android:src="@drawable/ic_dehaze_black_24dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+                android:padding="@dimen/_7sdp"
+                android:src="@drawable/ic_dehaze_black_24dp" />
         </RelativeLayout>
 
         <LinearLayout

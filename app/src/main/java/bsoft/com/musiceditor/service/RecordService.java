@@ -144,16 +144,13 @@ public class RecordService extends Service {
 
     private void startRecord() {
         if (!isRecording) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    isRecording = true;
-                    mStartingTimeMillis = System.currentTimeMillis();
-                    setFormat();
-                    setOutBitrate();
-                    setFileNameAndPath();
-                    startRecording();
-                }
+            new Thread(() -> {
+                isRecording = true;
+                mStartingTimeMillis = System.currentTimeMillis();
+                setFormat();
+                setOutBitrate();
+                setFileNameAndPath();
+                startRecording();
             }).start();
             Toast.makeText(getApplicationContext(), getResources().getString(R.string.startRecord), Toast.LENGTH_SHORT).show();
             updateTime();
@@ -193,7 +190,7 @@ public class RecordService extends Service {
         PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext()
                 , 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext());
+        NotificationCompat.Builder notificationCompatBuilder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID);
 
         notificationCompatBuilder.setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
@@ -308,33 +305,43 @@ public class RecordService extends Service {
     }
 
     private FileOutputStream createFileOutputStreamFromDocumentTree() throws FileNotFoundException {
-        //  String rootTreePath = MyApplication.getUriTree();
+
         treePath = SharedPrefs.getInstance().get(Utils.TREE_URI, String.class, null);
-//         Log.d("lynah",treePath);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && treePath != null) {
+
             try {
                 DocumentFile pickedDir = DocumentFile.fromTreeUri(this, Uri.parse(treePath));
                 DocumentFile mediaFile = pickedDir.createFile("audio/*", new File(mFilePath).getName());
 
                 if (mediaFile != null) {
+
                     FileOutputStream outputStream = (FileOutputStream) MyApplication.getAppContext().getContentResolver().openOutputStream(mediaFile.getUri());
+
                     if (outputStream == null) {
                         throw new Exception("outputStream null: Create new file");
                     } else {
                         return outputStream;
                     }
+
                 } else {
                     throw new Exception("mediaFile null: Create new file");
                 }
             } catch (Exception e) {
+
                 e.printStackTrace();
+
                 String path = Environment.getExternalStorageDirectory().getAbsolutePath() + Keys.DIR_APP + Keys.DIR_RECORDER;
+
                 File dir = new File(path);
                 if (!dir.exists()) {
                     dir.mkdirs();
                 }
+
                 File file = new File(path, new File(mFilePath).getName());
+
                 mFilePath = file.getAbsolutePath();
+
                 return new FileOutputStream(mFilePath);
             }
         } else {
@@ -444,41 +451,27 @@ public class RecordService extends Service {
         sendBroadcast(new Intent().setAction(Keys.STOP_RECORD));
         Toast.makeText(getApplicationContext(), getResources().getString(R.string.stopRecord), Toast.LENGTH_SHORT).show();
 
-//        if (time - 100 < 1000) {
-//            String urilFile = SharedPrefs.getInstance().get(Utils.TREE_URI, String.class, null);
-//            if (urilFile != null && !urilFile.equals("")) {
-//
-//                DocumentFile fileuri = DocumentFile.fromTreeUri(getApplicationContext(), Uri.parse(urilFile));
-//                DocumentFile file = fileuri.findFile(new File(mFilePath).getName());
-//                if (file != null) {
-//                    file.delete();
-//                } else {
-//                    File f = new File(mFilePath);
-//                    f.delete();
-//                }
-//
-//            } else {
-//                File file = new File(mFilePath);
-//                file.delete();
-//            }
-//
-//            //Toast.makeText(getApplicationContext(), getString(R.string.file_is_too_small), Toast.LENGTH_SHORT).show();
-//        } else {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && treePath != null) {
-            //mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, treePath);
-            addAudio(mFilePath, mFileName, getApplicationContext());
-            //Log.d("newp", treePath + " " + mFilePath);
+        if (time - 100 < 1000) {
+            File file = new File(mFilePath);
+            file.delete();
+
+            Toast.makeText(getApplicationContext(), getString(R.string.file_is_too_small), Toast.LENGTH_SHORT).show();
+
         } else {
-            //  mDataHandler.addRecord(mFileName, mFilePath, time - 100, valueFile, Utils.EMPTY);
-            addAudio(mFilePath, mFileName, getApplicationContext());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && treePath != null) {
+                addAudio(mFilePath, mFileName, getApplicationContext());
+
+            } else {
+                addAudio(mFilePath, mFileName, getApplicationContext());
+            }
+
+            stopForeground(true);
+
+            stopSelf();
+
+            super.onDestroy();
         }
-
-
-        //sendBroadcast(new Intent().setAction(Utils.UPDATE_LIST));
-
-        stopForeground(true);
-        stopSelf();
-
-        super.onDestroy();
     }
 }
+

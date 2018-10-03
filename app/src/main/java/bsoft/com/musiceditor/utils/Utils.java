@@ -49,7 +49,7 @@ public class Utils {
     public static final String AUDIO_ENTITY = "audio_entity";
     public static final String BITRATE_WAV = "bitrate_wav";
     public static final String BITRATE_MP3 = "bitrate_mp3";
-    public static final String CONVERT_LONG_TO_DATE = "dd/MM/yyyy hh:mm:ss";
+    public static final String CONVERT_LONG_TO_DATE = "dd/MM/yyyy HH:mm:ss";
 
     private static Pattern pattern = Pattern.compile("time=([\\d\\w:]+)");
 
@@ -88,8 +88,6 @@ public class Utils {
         values.put(MediaStore.Audio.Media.IS_RINGTONE, true);
         values.put(MediaStore.Audio.Media.DATE_ADDED, System.currentTimeMillis() + "");
         values.put(MediaStore.Audio.Media.SIZE, new File(path).length());
-
-        Log.e("xxx", Utils.convertDate(String.valueOf(System.currentTimeMillis()), Utils.CONVERT_LONG_TO_DATE) + "_____" + System.currentTimeMillis());
 
         Uri newUri = context.getContentResolver().insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
 
@@ -240,7 +238,7 @@ public class Utils {
                 MediaStore.Audio.Media.DATE_MODIFIED
         };
 
-        Cursor c = context.getContentResolver().query(uri, m_data, null, null, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
+        Cursor c = context.getContentResolver().query(uri, m_data, null, null, MediaStore.Audio.Media.DATE_ADDED + " DESC");
 
         if (c != null && c.moveToNext()) {
             do {
@@ -310,10 +308,10 @@ public class Utils {
                 int albumId, artistId;
 
                 id = c.getString(c.getColumnIndex(MediaStore.Audio.Media._ID));
+                path = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATA));
                 name = c.getString(c.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 album = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ALBUM));
                 artist = c.getString(c.getColumnIndex(MediaStore.Audio.Media.ARTIST));
-                path = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DATA));
                 duration = c.getString(c.getColumnIndex(MediaStore.Audio.Media.DURATION));
 
                 albumId = c.getInt(c.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
@@ -321,16 +319,12 @@ public class Utils {
                 String imagePath = ContentUris.withAppendedId(ART_CONTENT_URI, albumId).toString();
                 long size = c.getLong(c.getColumnIndex(MediaStore.Audio.Media.SIZE));
 
-
                 AudioEntity audio = new AudioEntity(id, name, artist, album, String.valueOf(duration), path, albumId, imagePath, dateModifier + "000");
                 audio.setSize(size);
 
                 try {
                     if (duration != null && Long.parseLong(duration) > 0 && path.contains(selection)) {
                         mListSong.add(audio);
-                        Log.e("xxx", "date " +
-                                dateModifier);
-
                     }
                 } catch (Exception e) {
 
@@ -340,7 +334,9 @@ public class Utils {
             } while (c.moveToNext());
         }
 
-        c.close();
+        if (c != null) {
+            c.close();
+        }
         return mListSong;
     }
 

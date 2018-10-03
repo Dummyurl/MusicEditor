@@ -1,6 +1,8 @@
 <resources>
 
     <string name="ad_banner_id">@string/lib_crs_admob_banner_id</string>
+    <string name="ad_native_id">@string/lib_crs_admob_native_id</string>
+    <string name="ad_full_id">@string/lib_crs_admob_full_id</string>
 
     <string name="app_name">Music Editor</string>
     <string name="more_app">More app</string>
@@ -48,4 +50,9 @@
     <string name="sort">Sort</string>
     <string name="please_choose_file">Please choose files you want to merger!</string>
     <string name="name_file_exist">File name is exist, please try again!</string>
+    <string name="file_is_too_small">File is too small, can not save file !</string>
+    <string name="error">Error</string>
+    <string name="you_need_to_have">You need to have at least 2 file</string>
+    <string name="checked_all">Check all</string>
+    <string name="delete_record">Delete</string>
 </resources>

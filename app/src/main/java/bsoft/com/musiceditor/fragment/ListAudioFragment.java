@@ -6,6 +6,7 @@ import android.database.Observable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -29,8 +30,11 @@ import bsoft.com.musiceditor.utils.Utils;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 
+import static android.app.Activity.RESULT_OK;
+
 public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnClick {
     private static final int AUDIO_CUTTER = 0;
+    private static final int REQUEST_CODE_AUDIO_CUTTER = 2;
     private RecyclerView rvAudio;
     private AudioAdapter adapter;
     private List<AudioEntity> audioEntityList = new ArrayList<>();
@@ -109,7 +113,7 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
             intent.putExtra(Keys.FILE_NAME, audioEntity.getPath());
             intent.setClassName(getContext().getPackageName(), RingdroidEditActivity.class.getName());
 
-            startActivityForResult(intent, 2);
+            startActivityForResult(intent, REQUEST_CODE_AUDIO_CUTTER);
 
         } else {
 
@@ -124,6 +128,24 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
                     .add(R.id.view_container, ConvertFragment.newInstance(bundle))
                     .addToBackStack(null)
                     .commit();
+
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_AUDIO_CUTTER && resultCode == RESULT_OK) {
+
+            for (Fragment fragment : getFragmentManager().getFragments()) {
+
+                if (fragment != null) {
+                    getFragmentManager().beginTransaction().remove(fragment).commit();
+                }
+            }
+
+            getContext().sendBroadcast(new Intent(Keys.OPEN_STUDIO_CUTTER));
 
         }
     }
@@ -193,6 +215,11 @@ public class ListAudioFragment extends BaseFragment implements AudioAdapter.OnCl
 
     @Override
     public void onOptionClick(int index) {
+
+    }
+
+    @Override
+    public void onListChecked(List<AudioEntity> listChecked) {
 
     }
 }

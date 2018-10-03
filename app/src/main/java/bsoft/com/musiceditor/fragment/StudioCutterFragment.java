@@ -14,47 +14,50 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetDialog;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.FileProvider;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import bsoft.com.musiceditor.BuildConfig;
 import bsoft.com.musiceditor.R;
+import bsoft.com.musiceditor.activity.MainActivity;
+import bsoft.com.musiceditor.adapter.AudioActionAdapter;
 import bsoft.com.musiceditor.adapter.AudioAdapter;
 import bsoft.com.musiceditor.model.AudioEntity;
 import bsoft.com.musiceditor.utils.Flog;
 import bsoft.com.musiceditor.utils.Keys;
 import bsoft.com.musiceditor.utils.Utils;
 
-import static bsoft.com.musiceditor.utils.Utils.FORMAT_AAC;
-import static bsoft.com.musiceditor.utils.Utils.FORMAT_M4A;
-import static bsoft.com.musiceditor.utils.Utils.FORMAT_MP3;
-import static bsoft.com.musiceditor.utils.Utils.FORMAT_OGG;
-import static bsoft.com.musiceditor.utils.Utils.FORMAT_WAV;
 import static bsoft.com.musiceditor.utils.Utils.deleteAudio;
 import static bsoft.com.musiceditor.utils.Utils.getFileExtension;
 
-public class StudioCutterFragment extends BaseFragment implements AudioAdapter.OnClick {
+public class StudioCutterFragment extends BaseFragment implements AudioActionAdapter.OnClick {
     private List<AudioEntity> audioEntities = new ArrayList<>();
     private List<AudioEntity> listAllAudio = new ArrayList<>();
     private BottomSheetDialog bottomSheetDialog;
-    private AudioAdapter adapter;
+    private AudioActionAdapter adapter;
     private RecyclerView rvAudio;
     private AlertDialog.Builder builder;
     private AlertDialog alertDialog;
@@ -75,9 +78,7 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
                         //updateList();
 
                         break;
-
                 }
-
             }
         }
     };
@@ -98,9 +99,11 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
         audioEntities.clear();
         audioEntities.addAll(listAllAudio);
 
+        Flog.e("xxx", listAllAudio.size() + " " + CHECK_CURRENT_FRAGMENT);
+
         Collections.reverse(audioEntities);
 
-        adapter = new AudioAdapter(audioEntities, getContext(), this, true);
+        adapter = new AudioActionAdapter(audioEntities, this, this);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
 
@@ -120,6 +123,7 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
     public void beginSearch(String s) {
         audioEntities = Utils.filterAudioEntity(listAllAudio, s);
+        Collections.reverse(audioEntities);
         adapter.setFilter(audioEntities);
     }
 
@@ -127,17 +131,202 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_studio_cutter, container, false);
+    }
 
+//    @Override
+//    public void onClick(int index) {
+//        indexOption = index;
+//        PlaybackFragment playbackFragment = new PlaybackFragment().newInstance(audioEntities.get(indexOption));
+//        FragmentTransaction transaction = ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction();
+//        playbackFragment.show(transaction, "dialog_playback");
+//    }
+
+    StudioFragment studioFragment;
+
+//    @Override
+//    public boolean onLongClick(int index) {
+//        //deleteRecord();
+////        Fragment fragment = getActivity().getSupportFragmentManager().findFragmentById(R.id.view_container);
+////        if (fragment instanceof StudioFragment) {
+////            studioFragment = (StudioFragment) fragment;
+////
+////        }
+//        createAction();
+//        return true;
+//
+//    }
+
+    MainActivity context;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        this.context = (MainActivity) context;
+    }
+
+    private ActionMode actionMode = null;
+    public boolean isActionMode = false;
+    public int countItemSelected = 0;
+    public boolean isSelectAll = false;
+
+
+    public void createAction() {
+        context.startSupportActionMode(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                isActionMode = true;
+                for (AudioEntity audioEntity : audioEntities) {
+                    audioEntity.setCheck(false);
+                }
+                adapter.notifyDataSetChanged();
+                actionMode = mode;
+                actionMode.setTitle("0");
+                context.getMenuInflater().inflate(R.menu.setting_menu, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.item_delete:
+                        actionModeDelete(mode);
+                        break;
+                    case R.id.item_check_all:
+                        selectItem();
+                        break;
+                }
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                isActionMode = false;
+                isSelectAll = false;
+                countItemSelected = 0;
+                if (mListChecked != null) {
+                    mListChecked.clear();
+                }
+                for (AudioEntity audioEntity : audioEntities) {
+                    audioEntity.setCheck(false);
+                }
+                adapter.notifyDataSetChanged();
+                mode.finish();
+            }
+        });
+    }
+
+    public void prepareSelection(View view, int i) {
+        if (((CheckBox) view).isChecked()) {
+            if (!mListChecked.contains(audioEntities.get(i))) {
+                mListChecked.add(audioEntities.get(i));
+                countItemSelected = countItemSelected + 1;
+                updateCountItemSelected();
+            }
+        } else {
+            if (mListChecked.contains(audioEntities.get(i))) {
+                mListChecked.remove(audioEntities.get(i));
+                countItemSelected = countItemSelected - 1;
+                updateCountItemSelected();
+            }
+        }
+    }
+
+    private void selectItem() {
+        if (!isSelectAll) {
+            countItemSelected = audioEntities.size();
+            isSelectAll = true;
+            for (AudioEntity record : audioEntities) {
+                record.setCheck(true);
+            }
+            adapter.notifyDataSetChanged();
+            actionMode.setTitle(countItemSelected + "");
+            mListChecked.clear();
+            mListChecked.addAll(audioEntities);
+        } else {
+            isSelectAll = false;
+            for (AudioEntity audioEntity : audioEntities) {
+                audioEntity.setCheck(false);
+            }
+            mListChecked.clear();
+            countItemSelected = 0;
+            actionMode.setTitle(countItemSelected + " ");
+            actionMode.finish();
+        }
+    }
+
+    private List<AudioEntity> mListChecked = new ArrayList<>();
+
+    private void actionModeDelete(final ActionMode mode) {
+        if (mListChecked.size() != 0) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppCompatAlertDialogStyle);
+            builder.setTitle(getResources().getString(R.string.delete_this_record));
+            builder.setPositiveButton(getResources().getString(R.string.yes), (dialog, id) -> {
+
+                settingDeleteRecord();
+                isActionMode = false;
+                isSelectAll = false;
+                adapter.notifyDataSetChanged();
+                mode.finish();
+            });
+            builder.setNegativeButton(getResources().getString(R.string.no), (dialog, id) -> dialog.dismiss());
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
+    }
+
+    private void settingDeleteRecord() {
+        List<AudioEntity> audios = new ArrayList<>();
+        for (AudioEntity audioEntity : audioEntities) {
+            if (audioEntity.getPath().toLowerCase().equals(audioEntity.getPath().toLowerCase())) {
+                audios.add(audioEntities.get(indexOption));
+            }
+        }
+
+
+        if (mListChecked.size() != 0) {
+
+            for (AudioEntity audioEntity : mListChecked) {
+                File file = new File(audioEntity.getPath());
+                file.delete();
+            
+                Utils.deleteAudio(getContext(), audioEntity.getPath());
+
+                countItemSelected = countItemSelected - 1;
+
+            }
+
+            updateList();
+
+            updateCountItemSelected();
+
+            adapter.notifyDataSetChanged();
+            context.sendBroadcast(new Intent(Keys.UPDATE_DELETE_RECORD));
+        }
+    }
+
+    public void updateCountItemSelected() {
+        if (countItemSelected == 0)
+            actionMode.setTitle("0");
+        else
+            actionMode.setTitle(countItemSelected + "");
     }
 
     @Override
-    public void onClick(int index) {
-
+    public void onClick(int index, boolean isAction) {
+        indexOption = index;
+        PlaybackFragment playbackFragment = new PlaybackFragment().newInstance(audioEntities.get(indexOption));
+        FragmentTransaction transaction = ((FragmentActivity) getContext()).getSupportFragmentManager().beginTransaction();
+        playbackFragment.show(transaction, "dialog_playback");
     }
 
     @Override
-    public boolean onLongClick(int index) {
-        deleteRecord();
+    public boolean onLongClick(int index, boolean isAction) {
+        createAction();
         return true;
     }
 
@@ -147,6 +336,11 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
         indexOption = index;
 
         showBottomSheet(indexOption);
+
+    }
+
+    @Override
+    public void onListChecked(List<AudioEntity> listChecked) {
 
     }
 
@@ -308,8 +502,11 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
 
     @Override
     public void onDetach() {
-
-        getContext().unregisterReceiver(receiver);
+        try {
+            getContext().unregisterReceiver(receiver);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         super.onDetach();
     }
@@ -319,14 +516,18 @@ public class StudioCutterFragment extends BaseFragment implements AudioAdapter.O
     }
 
     private void updateList() {
+
         listAllAudio.clear();
-        listAllAudio.addAll(Utils.getAudioConvert(getContext(), Keys.DIR_CUTTER));
+        listAllAudio.addAll(Utils.getAudioConvert(getContext(), CHECK_CURRENT_FRAGMENT));
+
         audioEntities.clear();
         audioEntities.addAll(listAllAudio);
 
         Collections.reverse(audioEntities);
 
-        adapter.setFilter(audioEntities);
+        adapter.notifyDataSetChanged();
+
+        Utils.closeKeyboard(getActivity());
 
         if (bottomSheetDialog != null) {
             bottomSheetDialog.dismiss();

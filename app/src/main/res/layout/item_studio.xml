@@ -101,6 +101,19 @@
             android:src="@drawable/ic_more"
             android:textColor="#fff"
             android:textSize="@dimen/_10ssp" />
+        <CheckBox
+            android:checked="false"
+            android:id="@+id/checkbox"
+            android:layout_width="@dimen/_22sdp"
+            android:layout_height="@dimen/_22sdp"
+            android:layout_gravity="center_vertical"
+
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/_7sdp"
+            android:theme="@style/MyCheckBox"
+            android:visibility="gone"
+            android:layout_marginEnd="@dimen/_7sdp" />
 
         <ImageView
             android:layout_width="match_parent"

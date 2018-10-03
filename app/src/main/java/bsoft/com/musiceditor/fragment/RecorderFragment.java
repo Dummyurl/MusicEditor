@@ -63,10 +63,11 @@ public class RecorderFragment extends BaseFragment implements QualityAdapter.OnC
 
                 switch (intent.getAction()) {
                     case STOP_RECORD:
+                        isRecording = !isRecording;
                         ivRecord.setImageResource(R.drawable.ic_play_arrow_white);
+                        tvTime.setText("00:00");
                         break;
                 }
-
             }
         }
     };

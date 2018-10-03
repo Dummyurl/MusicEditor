@@ -1,5 +1,9 @@
 package bsoft.com.musiceditor.utils;
 
+import android.os.Environment;
+
+import java.io.File;
+
 public class Keys {
     public static final String DIR_APP = "/BMusicEditor";
     public static final String DIR_CONVERTER = "/Converter";
@@ -21,7 +25,16 @@ public class Keys {
     public static final int STUDIO_MERGER = 1;
     public static final int STUDIO_CONVERTER = 2;
     public static final int STUDIO_RECORDER = 3;
-    public static final String UPDATE_SELECT_SONG ="update_select_song" ;
-    public static final String LIST_SONG ="list__song" ;
-    public static final String UPDATE_LIST_STUDIO ="update_list_studio" ;
+    public static final String UPDATE_SELECT_SONG = "update_select_song";
+    public static final String LIST_SONG = "list__song";
+    public static final String UPDATE_LIST_STUDIO = "update_list_studio";
+    public static final String DURATION = "duration";
+    public static final String CLEAR_LIST_AUDIO_MERGER = "clear_merger_list";
+    public static final String OPEN_FRAGMENT = "open_fragment";
+    public static final String OPEN_STUDIO_CONVERTER = "open_studio_converter";
+    public static final String OPEN_STUDIO_CUTTER = "open_studio_cutter";
+    public static final String UPDATE_DELETE_RECORD ="update_delete_audio" ;
+    public static File mSdCard = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+    public static File APP_DIRECTORY = new File(mSdCard, "BMusicEditor");
+    public static final File TEMP_DIRECTORY = new File(APP_DIRECTORY, ".temp");
 }

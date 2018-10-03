@@ -20,6 +20,9 @@ import bsoft.com.musiceditor.R;
 import bsoft.com.musiceditor.listener.IItemTouchHelperAdapter;
 import bsoft.com.musiceditor.listener.IListSongChanged;
 import bsoft.com.musiceditor.model.AudioEntity;
+import bsoft.com.musiceditor.utils.Utils;
+
+import static bsoft.com.musiceditor.utils.Utils.convertMillisecond;
 
 public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> implements IItemTouchHelperAdapter {
     private List<AudioEntity> audioEntityList;
@@ -42,15 +45,32 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> im
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
         AudioEntity audioEntity = audioEntityList.get(position);
+
         holder.tvName.setText(audioEntity.getNameAudio());
         holder.tvArtist.setText(audioEntity.getNameArtist());
+        holder.tvDuration.setText(convertMillisecond(Long.parseLong(audioEntity.getDuration())));
+
         holder.ivSort.setOnTouchListener((view, motionEvent) -> {
+
             if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
                 callback.onStartDrag(holder);
+
             }
             return false;
         });
+
+       holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+           @Override
+           public boolean onTouch(View v, MotionEvent event) {
+               if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
+                   callback.onStartDrag(holder);
+
+               }
+               return true;
+           }
+       });
 
     }
 
@@ -81,13 +101,14 @@ public class SortAdapter extends RecyclerView.Adapter<SortAdapter.ViewHolder> im
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivSort;
-        private TextView tvName, tvArtist;
+        private TextView tvName, tvArtist, tvDuration;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ivSort = itemView.findViewById(R.id.iv_sort);
             tvName = itemView.findViewById(R.id.name_song);
             tvArtist = itemView.findViewById(R.id.name_artist);
+            tvDuration = itemView.findViewById(R.id.duration);
         }
     }
 }

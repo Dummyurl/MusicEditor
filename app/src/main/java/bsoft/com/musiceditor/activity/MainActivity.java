@@ -1,6 +1,10 @@
 package bsoft.com.musiceditor.activity;
 
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,7 +18,11 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bsoft.core.AdmobBannerHelper;
+import com.bsoft.core.AdmobFullHelper;
+import com.bsoft.core.AppRate;
 import com.bsoft.core.BUtils;
+import com.bsoft.core.CrsDialogFragment;
+import com.bsoft.core.OnClickButtonListener;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdLoader;
 import com.google.android.gms.ads.AdRequest;
@@ -37,13 +45,41 @@ import bsoft.com.musiceditor.fragment.SelectFileMergerFragment;
 import bsoft.com.musiceditor.fragment.ListAudioFragment;
 import bsoft.com.musiceditor.fragment.RecorderFragment;
 import bsoft.com.musiceditor.fragment.StudioFragment;
+import bsoft.com.musiceditor.fragment.StudioMergerFragment;
 import bsoft.com.musiceditor.utils.Flog;
 import bsoft.com.musiceditor.utils.Keys;
+
+import static bsoft.com.musiceditor.fragment.StudioFragment.AUDIO_MERGER;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int AUDIO_CUTTER = 0;
     private static final int AUDIO_CONVERTER = 1;
+
+    private AdmobFullHelper admobFullHelper;
+    private BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent != null && intent.getAction() != null) {
+
+                switch (intent.getAction()) {
+
+                    case Keys.CLEAR_LIST_AUDIO_MERGER:
+                        addFragmentStudio(AUDIO_MERGER);
+                        break;
+
+                    case Keys.OPEN_STUDIO_CONVERTER:
+                        addFragmentStudio(AUDIO_CONVERTER);
+                        break;
+
+                    case Keys.OPEN_STUDIO_CUTTER:
+                        addFragmentStudio(AUDIO_CUTTER);
+                        break;
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,47 +88,17 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         initToolbar();
-        initFolder();
         adView();
         loadNativeAdvanced();
 
+        CrsDialogFragment.loadData(this);
+        admobFullHelper = new AdmobFullHelper(this)
+                .setAdUnitId(getString(R.string.ad_full_id))
+                .setShowAfterLoaded(false);
+        admobFullHelper.load();
+
     }
 
-    private void initFolder() {
-        String dirApp, dirConverter, dirMerger, dirCutter, dirRecorder;
-        dirApp = Environment.getExternalStorageDirectory().getAbsolutePath() + Keys.DIR_APP;
-        dirConverter = dirApp + Keys.DIR_CONVERTER;
-        dirCutter = dirApp + Keys.DIR_CUTTER;
-        dirRecorder = dirApp + Keys.DIR_RECORDER;
-        dirMerger = dirApp + Keys.DIR_MERGER;
-
-        File fileApp = new File(dirApp);
-        if (!fileApp.exists()) {
-            fileApp.mkdir();
-        }
-
-        File fileConverter = new File(dirConverter);
-        if (!fileConverter.exists()) {
-            fileConverter.mkdir();
-        }
-
-        File fileCutter = new File(dirCutter);
-        if (!fileCutter.exists()) {
-            fileCutter.mkdir();
-        }
-
-        File fileRecorder = new File(dirRecorder);
-        if (!fileRecorder.exists()) {
-            fileRecorder.mkdir();
-        }
-
-        File fileMerger = new File(dirMerger);
-        if (!fileMerger.exists()) {
-            fileMerger.mkdir();
-        }
-    }
-
-    private AdView mAdView;
 
     private void adView() {
         FrameLayout flAdBanner = (FrameLayout) findViewById(R.id.fl_ad_banner);
@@ -189,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadNativeAdvanced() {
         boolean loadInstallAd = System.currentTimeMillis() % 2 == 0;
-        AdLoader.Builder builder = new AdLoader.Builder(getApplicationContext(), getString(R.string.lib_crs_admob_native_id));
+        AdLoader.Builder builder = new AdLoader.Builder(getApplicationContext(), getString(R.string.ad_native_id));
 
         if (loadInstallAd) {
             builder.forAppInstallAd(nativeAppInstallAd -> {
@@ -234,7 +240,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void initToolbar() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.inflateMenu(R.menu.menu_ads);
         toolbar.setTitle(getString(R.string.app_name));
         toolbar.getMenu().findItem(R.id.item_ads).setOnMenuItemClickListener(v -> moreApp());
@@ -245,17 +251,44 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void onBackPressed() {
+
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+
+        } else {
+
+            BUtils.buildAppRate(this, () -> finish());
+
+            if (AppRate.showRateDialogIfMeetsConditions(this)) {
+
+            } else {
+                showExitDialog();
+            }
+        }
+    }
+
+    private void showExitDialog() {
+        BUtils.showMoreAppDialog(getSupportFragmentManager(), () -> finish());
+    }
 
     private void initView() {
 
         mNativeAdLayout = (FrameLayout) findViewById(R.id.view_ads);
 
-        findViewById(R.id.view_studio).setOnClickListener(v -> addFragmentStudio());
+        findViewById(R.id.view_studio).setOnClickListener(v -> addFragmentStudio(0));
         findViewById(R.id.view_more_app).setOnClickListener(v -> moreApp());
         findViewById(R.id.view_recorder).setOnClickListener(v -> addFragmentCutter());
         findViewById(R.id.view_merger).setOnClickListener(v -> addFragmentMerger());
         findViewById(R.id.view_cutter).setOnClickListener(v -> addFragmentConvert(AUDIO_CUTTER));
         findViewById(R.id.view_converter).setOnClickListener(v -> addFragmentConvert(AUDIO_CONVERTER));
+
+        IntentFilter it = new IntentFilter();
+        it.addAction(Keys.CLEAR_LIST_AUDIO_MERGER);
+        it.addAction(Keys.OPEN_STUDIO_CONVERTER);
+        it.addAction(Keys.OPEN_STUDIO_CUTTER);
+        registerReceiver(receiver, it);
 
     }
 
@@ -270,10 +303,11 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void addFragmentStudio() {
+    private void addFragmentStudio(int openFragment) {
 
         Bundle bundle = new Bundle();
         bundle.putInt(Keys.CHECK_OPEN_STUDIO, Keys.FROM_MAIN);
+        bundle.putInt(Keys.OPEN_FRAGMENT, openFragment);
 
         getSupportFragmentManager().beginTransaction()
                 .setCustomAnimations(R.anim.animation_left_to_right
@@ -283,6 +317,13 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.view_container, StudioFragment.newInstance(bundle))
                 .addToBackStack(null)
                 .commit();
+
+
+        if (openFragment == 0) {
+            if (admobFullHelper != null) {
+                admobFullHelper.show();
+            }
+        }
     }
 
     private void addFragmentCutter() {
@@ -310,5 +351,11 @@ public class MainActivity extends AppCompatActivity {
                 .add(R.id.view_container, ListAudioFragment.newInstance(bundle))
                 .addToBackStack(null)
                 .commit();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
     }
 }

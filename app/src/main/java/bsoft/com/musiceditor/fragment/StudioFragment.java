@@ -20,10 +20,10 @@ import bsoft.com.musiceditor.adapter.StudioAdapter;
 import bsoft.com.musiceditor.utils.Keys;
 
 public class StudioFragment extends BaseFragment {
-    private static final int AUDIO_CUTTER = 0;
-    private static final int AUDIO_MERGER = 1;
-    private static final int AUDIO_CONVERTER = 2;
-    private static final int AUDIO_RECORDER = 3;
+    public static final int AUDIO_CUTTER = 0;
+    public static final int AUDIO_MERGER = 1;
+    public static final int AUDIO_CONVERTER = 2;
+    public static final int AUDIO_RECORDER = 3;
     private StudioAdapter studioAdapter;
     private ViewPager viewPager;
     public Toolbar toolbar;
@@ -41,11 +41,13 @@ public class StudioFragment extends BaseFragment {
     }
 
     private int CHECK_STATE_ADD = 0;
+    private int OPEN_FRAGMENT = 0;
 
     @Override
     public void initViews() {
 
         CHECK_STATE_ADD = getArguments().getInt(Keys.CHECK_OPEN_STUDIO);
+        OPEN_FRAGMENT = getArguments().getInt(Keys.OPEN_FRAGMENT, 0);
 
         addTabFragment();
         initToolbar();
@@ -91,7 +93,7 @@ public class StudioFragment extends BaseFragment {
 
                     Fragment viewPagerFragment = (Fragment) viewPager.getAdapter().instantiateItem(viewPager, i);
 
-                    if (viewPagerFragment != null && viewPagerFragment.isAdded()) {
+                    if (viewPagerFragment.isAdded()) {
 
                         if (viewPagerFragment instanceof StudioCutterFragment) {
 
@@ -99,26 +101,6 @@ public class StudioFragment extends BaseFragment {
 
                             if (studioCutterFragment != null) {
                                 studioCutterFragment.beginSearch(s);
-                            }
-                        } else if (viewPagerFragment instanceof StudioMergerFragment) {
-                            studioMergerFragment = (StudioMergerFragment) viewPagerFragment;
-
-                            if (studioMergerFragment != null) {
-                                studioMergerFragment.beginSearch(s);
-                            }
-
-                        } else if (viewPagerFragment instanceof StudioConverterFragment) {
-
-                            studioConverterFragment = (StudioConverterFragment) viewPagerFragment;
-
-                            if (studioConverterFragment != null) {
-                                studioConverterFragment.beginSearch(s);
-                            }
-                        } else if (viewPagerFragment instanceof StudioRecorderFragment) {
-                            studioRecorderFragment = (StudioRecorderFragment) viewPagerFragment;
-
-                            if (studioRecorderFragment != null) {
-                                studioRecorderFragment.beginSearch(s);
                             }
                         }
                     }
@@ -146,6 +128,17 @@ public class StudioFragment extends BaseFragment {
         if (CHECK_STATE_ADD == Keys.FROM_RECORDER) {
             viewPager.setCurrentItem(AUDIO_RECORDER);
             viewPager.setOffscreenPageLimit(3);
+            return;
+        }
+
+        if (OPEN_FRAGMENT == AUDIO_MERGER) {
+            viewPager.setCurrentItem(AUDIO_MERGER);
+
+        } else if (OPEN_FRAGMENT == AUDIO_CONVERTER) {
+            viewPager.setCurrentItem(AUDIO_CONVERTER);
+
+        } else {
+            viewPager.setCurrentItem(AUDIO_CUTTER);
         }
     }
 

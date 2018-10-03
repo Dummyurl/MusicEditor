@@ -110,6 +110,11 @@ public class StudioRecorderFragment extends BaseFragment implements AudioAdapter
     }
 
     @Override
+    public void onListChecked(List<AudioEntity> listChecked) {
+
+    }
+
+    @Override
     public void onDestroy() {
         getContext().unregisterReceiver(receiver);
         super.onDestroy();

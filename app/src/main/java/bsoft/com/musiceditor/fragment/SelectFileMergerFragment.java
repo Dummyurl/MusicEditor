@@ -1,6 +1,5 @@
 package bsoft.com.musiceditor.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +30,7 @@ public class SelectFileMergerFragment extends BaseFragment implements SelectSong
     private List<AudioEntity> listChecked = new ArrayList<>();
     private SearchView searchView;
     private SelectSongAdapter adapter;
+
 
     public static SelectFileMergerFragment newInstance() {
         Bundle args = new Bundle();
@@ -74,12 +74,19 @@ public class SelectFileMergerFragment extends BaseFragment implements SelectSong
 
         } else {
 
+            long duration = 0;
+
+            for (AudioEntity audioEntity : listChecked) {
+                duration += Long.parseLong(audioEntity.getDuration());
+            }
+
             Bundle bundle = new Bundle();
 
             bundle.putParcelableArrayList(Keys.LIST_SONG, (ArrayList<? extends Parcelable>) listChecked);
+            bundle.putLong(Keys.DURATION, duration);
 
             getFragmentManager().beginTransaction()
-                    .add(R.id.view_container, SortFragment.newInstance(bundle))
+                    .add(R.id.view_container, SortMergerFragment.newInstance(bundle))
                     .addToBackStack(null)
                     .commit();
         }

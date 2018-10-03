@@ -16,6 +16,7 @@ import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -189,6 +190,8 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
 
                         progressDialog.setProgress(100);
 
+                        Toast.makeText(getContext(), getString(R.string.create_file) + ": " + path, Toast.LENGTH_SHORT).show();
+
                         new Handler().postDelayed(() -> {
                             if (progressDialog == null) {
                                 return;
@@ -197,7 +200,14 @@ public class ConvertFragment extends BaseFragment implements FormatAdapter.OnCli
                             }
                         }, 500);
 
-                        Toast.makeText(getContext(), getString(R.string.create_file) + ": " + path, Toast.LENGTH_SHORT).show();
+                        for (Fragment fragment : getFragmentManager().getFragments()) {
+                            if (fragment != null) {
+                                getFragmentManager().beginTransaction().remove(fragment).commit();
+                            }
+                        }
+
+                        getContext().sendBroadcast(new Intent(Keys.OPEN_STUDIO_CONVERTER));
+
 
                     } else {
                         if (progressDialog == null) {

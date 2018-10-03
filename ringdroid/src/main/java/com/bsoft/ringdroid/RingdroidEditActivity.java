@@ -937,9 +937,9 @@ public class RingdroidEditActivity extends AppCompatActivity implements MarkerVi
     private String makeRingtoneFilename(CharSequence title, String extension) {
         String subdir;
         String externalRootDir = Environment.getExternalStorageDirectory().getPath();
-        if (!externalRootDir.endsWith("/")) {
-            externalRootDir += "/";
-        }
+//        if (!externalRootDir.endsWith("/")) {
+//            externalRootDir += "/";
+//        }
 
         externalRootDir = externalRootDir + Keys.DIR_APP + Keys.DIR_CUTTER;
 

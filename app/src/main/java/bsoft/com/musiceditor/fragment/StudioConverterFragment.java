@@ -77,4 +77,9 @@ public class StudioConverterFragment extends BaseFragment implements AudioAdapte
     public void onOptionClick(int index) {
 
     }
+
+    @Override
+    public void onListChecked(List<AudioEntity> listChecked) {
+
+    }
 }
